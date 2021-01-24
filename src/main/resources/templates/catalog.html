@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title th:text="#{page.description('Catalog')}">CuberShop | Catalog</title>
+
+		<!-- Required meta tags -->
+	    <meta charset="utf-8"/>
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+	     <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+        
+	    <!-- owner CSS -->
+	    <link rel="stylesheet" href="/owner/style.css"/>
+	</head>
+
+	<body class="bg-transparent" th:replace="~{/frag/base :: base(~{::content}, 'Catalog')}">
+
+        <div class="container-fluid my-5" th:fragment="content">
+        	<hr class="mt-0 bg-dark w-75"/>
+        	<span class="h3 text-center d-block" th:text="${productType}">3x3x3</span>
+            <hr class="mb-4 mt-0 bg-dark w-75"/>
+
+            <div class="row justify-content-center">
+                <div class="col-10 col-md-8 col-lg-7 col-xl-6" th:switch="${selectedOrder}">
+                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'alphaAsc'">
+                        <li class="list-group-item list-group-item-action bg-li-nu-color">
+                            <a class="text-decoration-none text-white" href="?order=alpha&sort=asc">Alfabetica</a>
+                        </li>
+                        <li class="list-group-item list-group-item-action cursor-pointer-hover">
+                            <a class="text-decoration-none text-dark" href="?order=price&sort=asc">Preço crescente</a>
+                        </li>
+                        <li class="list-group-item list-group-item-action cursor-pointer-hover">
+                            <a class="text-decoration-none text-dark" href="?order=price&sort=desc">Preço decrescente</a>
+                        </li>
+                    </ul>
+                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'priceAsc'">
+                        <li class="list-group-item list-group-item-action cursor-pointer-hover">
+                            <a class="text-decoration-none text-dark" href="?order=alpha&sort=asc">Alfabetica</a>
+                        </li>
+                        <li class="list-group-item list-group-item-action bg-li-nu-color ">
+                            <a class="text-decoration-none text-white" href="?order=price&sort=asc">Preço crescente</a>
+                        </li>
+                        <li class="list-group-item list-group-item-action cursor-pointer-hover">
+                            <a class="text-decoration-none text-dark" href="?order=price&sort=desc">Preço decrescente</a>
+                        </li>
+                    </ul>
+                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'priceDesc'">
+                        <li class="list-group-item list-group-item-action cursor-pointer-hover">
+                            <a class="text-decoration-none text-dark" href="?order=alpha&sort=asc">Alfabetica</a>
+                        </li>
+                        <li class="list-group-item list-group-item-action cursor-pointer-hover">
+                            <a class="text-decoration-none text-dark" href="?order=price&sort=asc">Preço crescente</a>
+                        </li>
+                        <li class="list-group-item list-group-item-action bg-li-nu-color ">
+                            <a class="text-decoration-none text-white" href="?order=price&sort=desc">Preço decrescente</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-3">
+                <div class="col-9">
+                    <div class="row no-gutters justify-content-center mb-0 mb-md-5" th:each="cubes : ${cubeList}">
+                        
+                        <div class="col-md-4 mb-5 mb-md-0 d-flex justify-content-center" th:each="cube : ${cubes}">
+                            <div class="card border-nu-color shadow" style="width: 18rem;">
+                                <div class="card-img-top-focus text-center">
+                                    <img th:src="@{|~/static/img/${cube.imageUUID[0]}|}" class="card-img-top" alt="..."/>
+                                    <img th:src="@{|~/static/img/${cube.imageUUID[1]}|}" class="card-img-top d-none" alt="..."/>
+                                </div>
+                                <div th:text="${cube.name}" class="text-center text-dark mt-2 h5">3X3X3 DNA CUBE CÔNCAVO
+                                </div>
+                                <span class="text-center d-none mt-2 text-muted product-code" th:text="|Code: ${cube.id}|">Code: 32</span>
+                                <div class="card-body text-center">
+                                    <h2 class="card-title text-info mb-1" th:text="${{cube.price}}">R$ 49,90</h2>
+                                </div>
+                                <div class="text-center my-2 mb-2">
+                                    <a class="btn btn-outline-nu-color w-75 mb-3" title="Comprar esse cubo" href="/description/3" th:href="@{|~/description/${cube.id}|}"><b>Comprar</b></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+		<!-- Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+        <!-- Fontawesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+
+        <!-- owner Js -->
+        <script src="/owner/script.js"></script>
+	</body>
+
+    <!-- Specific of this page -->
+    <script>
+        productCard.toogleCardImg();
+    </script>
+</html>

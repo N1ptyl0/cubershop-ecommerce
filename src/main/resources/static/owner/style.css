@@ -1,0 +1,57 @@
+* {
+	font-family: "Roboto Slab", Roboto;
+	font-weight: bolder;
+}
+
+.text-nu-color {
+	color: rgb(138, 5, 190);
+}
+
+.bg-nu-color, .bg-li-nu-color, .bg-li-nu-color:hover {
+	background-color: rgb(138, 5, 190);
+}
+
+.nav-button {
+	color: white;
+}
+
+.nav-button:hover {
+	color: rgb(138, 5, 190);
+	background-color: #ffff;
+}
+
+.border-nu-color {
+	border: 1px solid rgb(138, 5, 190);
+}
+
+#btn-subscribe {
+	background-color: white;
+	color: rgb(138, 5, 190);
+}
+
+.btn-outline-nu-color {
+	border: 1px solid rgb(138, 5, 190);
+	border-radius: 5px;
+	color: rgb(138, 5, 190);
+}
+
+.btn-outline-nu-color:hover, #btn-subscribe:hover {
+	background-color: rgb(138, 5, 190);
+	color: white;
+}
+
+.cursor-pointer-hover:hover {
+	cursor: pointer;
+}
+
+.user-dropdown-action-btn {
+	color: #343a40;
+}
+
+.user-dropdown-action-btn:hover {
+	color: rgb(138, 5, 190);
+}
+
+.border-nu-color {
+	border: 1px solid rgba(138, 5, 190, .6);
+}
