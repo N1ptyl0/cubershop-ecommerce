@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-public class CubershopApplication implements WebMvcConfigurer {
+public class CubershopApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CubershopApplication.class, args);
