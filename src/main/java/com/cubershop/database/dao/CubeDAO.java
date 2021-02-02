@@ -1,10 +1,7 @@
 package com.cubershop.database.dao;
 
-import com.cubershop.context.entity.Brand;
-import com.cubershop.context.entity.ColorPattern;
-import com.cubershop.context.entity.Price;
+import com.cubershop.context.entity.*;
 import com.cubershop.database.base.CubeDAOBase;
-import com.cubershop.context.entity.Cube;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.FormattingConversionService;
@@ -37,18 +34,22 @@ public class CubeDAO implements CubeDAOBase {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private Cube rowMapper(ResultSet rs, int rowNum) throws SQLException {
+    public Cube rowMapper(ResultSet rs, int rowNum) throws SQLException {
         Cube cube = new Cube();
 
         cube.setId(rs.getObject("id", UUID.class));
         cube.setName(rs.getString("name"));
         cube.setType(rs.getString("type"));
         cube.setPrice(converter.convert(rs.getDouble("price"), Price.class));
+        cube.setInstallment(new Installment(converter.convert(rs.getDouble("price"), Price.class), 3));
         cube.setImageUUID((UUID[]) rs.getArray("source").getArray());
         cube.setSize(rs.getInt("size"));
-        cube.setColorPattern(converter.convert(rs.getString("color_pattern").toUpperCase(), ColorPattern.class));
-        cube.setBrand(converter.convert(rs.getString("brand").toUpperCase(), Brand.class));
+        cube.setColorPattern(rs.getString("color_pattern").toUpperCase());
+        cube.setBrand(rs.getString("brand").toUpperCase());
         cube.setDescription(rs.getString("description"));
+        cube.setMagnetic(rs.getBoolean("is_magnetic"));
+        cube.setQuantity(rs.getInt("quantity"));
+        cube.setStock(rs.getBoolean("in_stock"));
         return cube;
     }
 
@@ -77,23 +78,27 @@ public class CubeDAO implements CubeDAOBase {
     }
 
     @Override
-    public void insertCube(Cube cube) {
+    public UUID saveCube(Cube cube) {
         String sql =
-        "INSERT INTO cube (name, price, brand, color_pattern, type, size, description) "+
-        "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;";
+        "INSERT INTO cube (name, price, brand, color_pattern, "+
+        "type, size, description, in_stock, is_magnetic, quantity) "+
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id;";
 
         UUID uuid = this.jdbcTemplate.queryForObject(sql, UUID.class,
             cube.getName(),
             cube.getPrice().getValue(),
-            cube.getBrand()+"",
-            cube.getColorPattern()+"",
+            cube.getBrand().toUpperCase(),
+            cube.getColorPattern().toUpperCase(),
             cube.getType(),
             cube.getSize(),
             cube.getDescription().isEmpty() || cube.getDescription().length() < 3
-            ? "Default description" : cube.getDescription()
+            ? "Default description" : cube.getDescription(),
+            cube.getStock(),
+            cube.getMagnetic(),
+            cube.getQuantity()
         );
 
-        if(cube.getImageFile().isEmpty()) return;
+        if(cube.getImageFile().isEmpty()) return uuid;
 
         this.jdbcTemplate.batchUpdate("INSERT INTO image (body, cube_id) VALUES (?, ?);",
             new BatchPreparedStatementSetter() {
@@ -114,6 +119,8 @@ public class CubeDAO implements CubeDAOBase {
                 }
             }
         );
+
+        return uuid;
     }
 
     @Override
@@ -127,26 +134,30 @@ public class CubeDAO implements CubeDAOBase {
     }
 
     @Override
-    public List<Cube> findCubesByTypeAndOrder(String type, String order, String sort) {
+    public List<Cube> findCubesByTypeAndOrder(String type, String order) {
+        String[] parse = order.split("_");
+        parse[0] = "c."+(parse[0].equals("alpha") ? "name" : parse[0]);
+        parse[1] = parse[1].toUpperCase();
+
         String sql =
         "SELECT c.*, ARRAY_AGG(i.id) AS source FROM cube AS c "+
         "INNER JOIN image AS i ON c.id = i.cube_id WHERE c.type = ? "+
         "GROUP BY c.id "+
-        String.format("ORDER BY %s %s;", order, sort);
+        String.format("ORDER BY %s %s;", parse[0], parse[1]);
 
         return jdbcTemplate.query(sql, this::rowMapper, type);
     }
 
-    @Override
-    public List<Cube> findCubesByIdList(String[] ids) {
-        String sql =
-        "SELECT c.*, ARRAY_AGG(i.id) AS source FROM cube AS c "+
-        "INNER JOIN image AS i ON c.id = i.cube_id WHERE c.id IN "+
-        "("+String.join(",", ids)+") "+
-        "GROUP BY c.id ORDER BY name";
-
-        return jdbcTemplate.query(sql, this::rowMapper);
-    }
+//    @Override
+//    public List<Cube> findCubesByIdList(String[] ids) {
+//        String sql =
+//        "SELECT c.*, ARRAY_AGG(i.id) AS source FROM cube AS c "+
+//        "INNER JOIN image AS i ON c.id = i.cube_id WHERE c.id IN "+
+//        "("+String.join(",", ids)+") "+
+//        "GROUP BY c.id ORDER BY name";
+//
+//        return jdbcTemplate.query(sql, this::rowMapper);
+//    }
 
     @Override
     public Cube findCubeById(UUID uuid) {

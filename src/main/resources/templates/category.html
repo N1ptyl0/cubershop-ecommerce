@@ -14,46 +14,46 @@
 	    <link rel="stylesheet" href="/owner/style.css"/>
 	</head>
 
-	<body class="bg-transparent" th:replace="~{frag/base :: base(~{::content}, 'Catalog')}">
+	<body class="bg-transparent" th:replace="~{frag/base :: base(~{::content}, 'Category')}">
 
         <div class="container-fluid my-5" th:fragment="content">
         	<hr class="mt-0 bg-dark w-75"/>
-        	<span class="h3 text-center d-block" th:text="${productType}">3x3x3</span>
+        	<span class="h3 text-center d-block" th:text="${category}">3x3x3</span>
             <hr class="mb-4 mt-0 bg-dark w-75"/>
 
             <div class="row justify-content-center">
                 <div class="col-10 col-md-8 col-lg-7 col-xl-6" th:switch="${selectedOrder}">
-                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'alphaAsc'">
+                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'alpha_asc'">
                         <li class="list-group-item list-group-item-action bg-li-nu-color">
-                            <a class="text-decoration-none text-white" href="?order=alpha&sort=asc">Alfabetica</a>
+                            <a class="text-decoration-none text-white" href="?order=alpha_asc">Alfabetica</a>
                         </li>
                         <li class="list-group-item list-group-item-action cursor-pointer-hover">
-                            <a class="text-decoration-none text-dark" href="?order=price&sort=asc">Preço crescente</a>
+                            <a class="text-decoration-none text-dark" href="?order=price_asc">Preço crescente</a>
                         </li>
                         <li class="list-group-item list-group-item-action cursor-pointer-hover">
-                            <a class="text-decoration-none text-dark" href="?order=price&sort=desc">Preço decrescente</a>
+                            <a class="text-decoration-none text-dark" href="?order=price_desc">Preço decrescente</a>
                         </li>
                     </ul>
-                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'priceAsc'">
+                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'price_asc'">
                         <li class="list-group-item list-group-item-action cursor-pointer-hover">
-                            <a class="text-decoration-none text-dark" href="?order=alpha&sort=asc">Alfabetica</a>
+                            <a class="text-decoration-none text-dark" href="?order=alpha_asc">Alfabetica</a>
                         </li>
                         <li class="list-group-item list-group-item-action bg-li-nu-color ">
-                            <a class="text-decoration-none text-white" href="?order=price&sort=asc">Preço crescente</a>
+                            <a class="text-decoration-none text-white" href="?order=price_asc">Preço crescente</a>
                         </li>
                         <li class="list-group-item list-group-item-action cursor-pointer-hover">
-                            <a class="text-decoration-none text-dark" href="?order=price&sort=desc">Preço decrescente</a>
+                            <a class="text-decoration-none text-dark" href="?order=price_desc">Preço decrescente</a>
                         </li>
                     </ul>
-                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'priceDesc'">
+                    <ul class="list-group list-group-horizontal-md text-center font-weight-bold mt-3 overflow-hidden border-nu-color shadow w-100" th:case="'price_desc'">
                         <li class="list-group-item list-group-item-action cursor-pointer-hover">
-                            <a class="text-decoration-none text-dark" href="?order=alpha&sort=asc">Alfabetica</a>
+                            <a class="text-decoration-none text-dark" href="?order=alpha_asc">Alfabetica</a>
                         </li>
                         <li class="list-group-item list-group-item-action cursor-pointer-hover">
-                            <a class="text-decoration-none text-dark" href="?order=price&sort=asc">Preço crescente</a>
+                            <a class="text-decoration-none text-dark" href="?order=price_asc">Preço crescente</a>
                         </li>
                         <li class="list-group-item list-group-item-action bg-li-nu-color ">
-                            <a class="text-decoration-none text-white" href="?order=price&sort=desc">Preço decrescente</a>
+                            <a class="text-decoration-none text-white" href="?order=price_desc">Preço decrescente</a>
                         </li>
                     </ul>
                 </div>
@@ -64,19 +64,20 @@
                     <div class="row no-gutters justify-content-center mb-0 mb-md-5" th:each="cubes : ${cubeList}">
                         
                         <div class="col-md-4 mb-5 mb-md-0 d-flex justify-content-center" th:each="cube : ${cubes}">
-                            <div class="card border-nu-color shadow" style="width: 18rem;">
+                            <div class="card" style="width: 18rem;">
                                 <div class="card-img-top-focus text-center">
-                                    <img th:src="@{|~/static/img/${cube.imageUUID[0]}|}" class="card-img-top" alt="..."/>
-                                    <img th:src="@{|~/static/img/${cube.imageUUID[1]}|}" class="card-img-top d-none" alt="..."/>
+                                    <img th:src="@{|~/static/img/${cube.imageUUID[0]}|}" src="https://classteaching.files.wordpress.com/2019/09/rubiks-cube.jpg" class="card-img-top" alt="..."/>
+                                    <img th:src="@{|~/static/img/${cube.imageUUID[1]}|}" src="https://www.toysrus.ca/on/demandware.static/-/Sites-toys-master-catalog/default/dw67e729d7/images/2DDF7C75_1.jpg" class="card-img-top d-none" alt="..."/>
                                 </div>
-                                <div th:text="${cube.name}" class="text-center text-dark mt-2 h5">3X3X3 DNA CUBE CÔNCAVO
+                                <div class="text-center text-dark mt-2 h5"><b th:text="${cube.name}">3X3X3 DNA CUBE CÔNCAVO</b>
                                 </div>
                                 <span class="text-center d-none mt-2 text-muted product-code" th:text="|Code: ${cube.id}|">Code: 32</span>
                                 <div class="card-body text-center">
-                                    <h2 class="card-title text-info mb-1" th:text="${{cube.price}}">R$ 49,90</h2>
+                                    <h2 class="card-title text-info" th:text="${{cube.price}}">R$ 49,90</h2>
+                                    <p class="text-muted h6"><b th:text="|Ou ${cube.installment}|">Ou até 3x de 14,96</b></p>
                                 </div>
-                                <div class="text-center my-2 mb-2">
-                                    <a class="btn btn-outline-nu-color w-75 mb-3" title="Comprar esse cubo" href="/description/3" th:href="@{|~/description/${cube.id}|}"><b>Comprar</b></a>
+                                <div class="text-center my-2">
+                                    <a class="btn btn-outline-nu-color w-75 mb-3" title="Comprar esse cubo" href="/description/3" th:href="@{|~#{route.page.description(${cube.id})}|}"><b>Comprar</b></a>
                                 </div>
                             </div>
                         </div>

@@ -47,7 +47,7 @@ public class AppConfiguration implements WebMvcConfigurer {
         HikariConfig config = new HikariConfig() {
             {
                 setDriverClassName("org.postgresql.Driver");
-                setJdbcUrl("jdbc:postgresql://localhost:5432/dev_db?useTimezone=true&serverTimezone=UTC");
+                setJdbcUrl("jdbc:postgresql://localhost:5432/test_db?useTimezone=true&serverTimezone=UTC");
                 setUsername("example");
                 setPassword("example");
             }

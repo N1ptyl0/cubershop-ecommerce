@@ -26,13 +26,6 @@ public final class PriceFormatter implements Formatter<Price> {
 
     @Override
     public String print(Price object, Locale locale) {
-        String[] slices = (object.getValue()+"").split("\\.");
-        String leftPart = slices[0], rightPart = slices[1];
-
-        if(rightPart.length() == 1) rightPart += "0";
-        else if(rightPart.length() > 2)
-            rightPart = rightPart.charAt(0)+""+rightPart.charAt(1);
-
-        return String.format("R$ %s,%s", leftPart, rightPart);
+        return object+"";
     }
 }

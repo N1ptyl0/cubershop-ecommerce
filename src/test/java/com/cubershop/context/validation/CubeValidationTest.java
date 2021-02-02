@@ -328,6 +328,43 @@ public final class CubeValidationTest {
         );
     }
 
+
+    @Test
+    public void deve_validar_campo_brand_muito_curto() {
+        cube.setBrand("an");
+        cubeValidation.validate(cube, errors);
+
+        assertTrue(errors.hasFieldErrors("brand"), "Prenseça de erros");
+        assertTrue(
+            errors.getFieldErrors("brand").stream()
+                .anyMatch(e -> e.getCode().equals("cube.brand.too.small")),
+            "Presença valida do codigo de erro"
+        );
+        assertTrue(
+            errors.getFieldErrors("brand").stream()
+                .anyMatch(e -> e.getDefaultMessage().equals("Brand can not be too small")),
+            "Presença valida do default message"
+        );
+    }
+
+    @Test
+    public void deve_validar_campo_brand_muito_longo() {
+        cube.setBrand("ant".repeat(100));
+        cubeValidation.validate(cube, errors);
+
+        assertTrue(errors.hasFieldErrors("brand"), "Prenseça de erros");
+        assertTrue(
+            errors.getFieldErrors("brand").stream()
+                .anyMatch(e -> e.getCode().equals("cube.brand.too.long")),
+            "Presença valida do codigo de erro"
+        );
+        assertTrue(
+            errors.getFieldErrors("brand").stream()
+                .anyMatch(e -> e.getDefaultMessage().equals("Brand can not be too long")),
+            "Presença valida do default message"
+        );
+    }
+
     @Test
     public void deve_validar_campo_colorPattern_vazio_ou_null() {
         cube.setColorPattern(null);
@@ -343,6 +380,42 @@ public final class CubeValidationTest {
             errors.getFieldErrors("colorPattern").stream()
                 .anyMatch(e -> e.getDefaultMessage().equals("Color pattern can not be empty")),
             "Default message do erro deve ser igual ao esperado"
+        );
+    }
+
+    @Test
+    public void deve_validar_campo_colorPattern_muito_curto() {
+        cube.setColorPattern("ant");
+        cubeValidation.validate(cube, errors);
+
+        assertTrue(errors.hasFieldErrors("colorPattern"), "Prenseça de erros");
+        assertTrue(
+            errors.getFieldErrors("colorPattern").stream()
+                .anyMatch(e -> e.getCode().equals("cube.colorPattern.too.small")),
+            "Presença valida do codigo de erro"
+        );
+        assertTrue(
+            errors.getFieldErrors("colorPattern").stream()
+                .anyMatch(e -> e.getDefaultMessage().equals("ColorPattern can not be too small")),
+            "Presença valida do default message"
+        );
+    }
+
+     @Test
+    public void deve_validar_campo_colorPattern_muito_longo() {
+        cube.setColorPattern("ant".repeat(25));
+        cubeValidation.validate(cube, errors);
+
+        assertTrue(errors.hasFieldErrors("colorPattern"), "Prenseça de erros");
+        assertTrue(
+            errors.getFieldErrors("colorPattern").stream()
+                .anyMatch(e -> e.getCode().equals("cube.colorPattern.too.long")),
+            "Presença valida do codigo de erro"
+        );
+        assertTrue(
+            errors.getFieldErrors("colorPattern").stream()
+                .anyMatch(e -> e.getDefaultMessage().equals("ColorPattern can not be too long")),
+            "Presença valida do default message"
         );
     }
 }

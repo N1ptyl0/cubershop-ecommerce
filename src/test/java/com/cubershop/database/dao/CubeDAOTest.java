@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
 
-public final class CubeDaoTest {
+public final class CubeDAOTest {
 
     private JdbcTemplate jdbcTemplate;
     private CubeDAO cubeDAO;
@@ -64,7 +64,7 @@ public final class CubeDaoTest {
         when(this.jdbcTemplate.batchUpdate(anyString(), any(BatchPreparedStatementSetter.class)))
             .thenReturn(new int[]{1});
 
-        cubeDAO.insertCube(cube);
+        cubeDAO.saveCube(cube);
 
         verify(this.jdbcTemplate, times(1)).queryForObject(
            anyString(),
@@ -100,7 +100,7 @@ public final class CubeDaoTest {
         when(this.jdbcTemplate.batchUpdate(anyString(), any(BatchPreparedStatementSetter.class)))
            .thenReturn(new int[]{1});
 
-        cubeDAO.insertCube(cube);
+        cubeDAO.saveCube(cube);
 
         verify(this.jdbcTemplate, times(1)).queryForObject(
             anyString(),
@@ -143,7 +143,7 @@ public final class CubeDaoTest {
         when(this.jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
             .thenReturn(expectedList);
 
-        List<Cube> resultingList = this.cubeDAO.findCubesByTypeAndOrder("2x2x2", "type", "desc");
+        List<Cube> resultingList = this.cubeDAO.findCubesByTypeAndOrder("2x2x2", "alpha_asc");
 
         assertNotNull(resultingList);
         assertEquals(3, resultingList.size(), "Size of resulting list");
@@ -153,22 +153,22 @@ public final class CubeDaoTest {
             .query(anyString(), any(RowMapper.class), anyString());
     }
 
-    @Test
-    public void findCubesByIdList_test() {
-        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube(), new Cube());
-
-        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class)))
-            .thenReturn(expectedList);
-
-        List<Cube> resultingList = this.cubeDAO.findCubesByIdList(new String[]{});
-
-        assertNotNull(resultingList);
-        assertEquals(3, resultingList.size(), "Size of resulting list");
-        assertEquals(expectedList, resultingList);
-
-        verify(this.jdbcTemplate, times(1))
-            .query(anyString(), any(RowMapper.class));
-    }
+//    @Test
+//    public void findCubesByIdList_test() {
+//        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube(), new Cube());
+//
+//        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class)))
+//            .thenReturn(expectedList);
+//
+//        List<Cube> resultingList = this.cubeDAO.findCubesByIdList(new String[]{});
+//
+//        assertNotNull(resultingList);
+//        assertEquals(3, resultingList.size(), "Size of resulting list");
+//        assertEquals(expectedList, resultingList);
+//
+//        verify(this.jdbcTemplate, times(1))
+//            .query(anyString(), any(RowMapper.class));
+//    }
 
     @Test
     public void findCubeById_test() {

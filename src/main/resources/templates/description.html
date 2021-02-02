@@ -18,8 +18,8 @@
 
         <div class="container-fluid my-5" th:fragment="content">
             <div class="row justify-content-center">
-                <div class="col-10">
-                    <div class="row bg-white shadow-lg border-nu-color p-3">
+                <div class="col-12 col-md-10">
+                    <div class="row bg-white p-3">
                         <div class="col-md-6">
                             <div id="products-carousel" class="carousel bg-white slide carousel-fade border rounded" data-ride="carousel" data-interval="1000">
                                 <ol class="carousel-indicators"></ol>
@@ -38,65 +38,88 @@
                                     <i class="fas fa-arrow-alt-circle-right fa-2x text-dark" aria-hidden="true"></i>
                                 </a>
                             </div>
-                            <div class="mt-5 border rounded p-3" style="font-size: 1.2rem;">
-                                <h4>Especificações:</h4>
-                                <ul class="text-dark">
-                                    <li><b class="mr-1">Tipo: </b><span th:text="${cube.type}">2x2x2</span></li>
-                                    <li><b class="mr-1">Marca: </b><span th:text="${cube.brand}">QIDI COLOR</span></li>
-                                    <li><b class="mr-1">Padrão de cores: </b><span th:text="${cube.colorPattern}">Tradicional</span></li>
-                                    <li><b class="mr-1">Tamanho: </b><span th:text="|${cube.size}mm|">43mm</span></li>
-                                </ul>
-                            </div>
+
+                            <ul class="list-group rounded mt-5" style="border-top: 3px solid rgb(138, 5, 190);" id="specs">
+                                <li class="list-group-item text-center text-nu-color">
+                                    <i class="fas fa-cogs fa-lg mr-2"></i>
+                                    <span class="text-center h4">Especificações</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-around">
+                                    <span class="h6">Tipo</span>
+                                    <span class="h6" th:text="${cube.type}">2x2x2</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-around">
+                                    <span class="h6">Marca</span>
+                                    <span class="h6" th:text="${cube.brand}">Warrior</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-around">
+                                    <span class="h6">Padrão de cores</span>
+                                    <span class="h6" th:text="${cube.colorPattern}">COLOR</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-around">
+                                    <span class="h6">Tamanho</span>
+                                    <span class="h6" th:text="|${cube.size}mm|">43mm</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-around">
+                                    <span class="h6">Magnético</span>
+                                    <span class="h6 text-nu-color" th:text="${cube.magnetic ? 'Sim' : 'Não'}">Não</span>
+                                </li>
+                            </ul>
                         </div>
                         <div class="col-md-6 mt-4 mt-md-0">
-                            <div class="card w-100 h-100 border rounded">
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <h1 class="ml-4" th:text="${cube.name}">2X2X2 QIDI COLOR</h1>
-                                </div>
+                            <div class="card w-100 h-100">
                                 <div class="card-body">
-                                    <h1 class="card-title text-info" th:text="${{cube.price}}">R$ 44,90</h1>
-                                    <p class="text mt-1"><span class="bg-dark text-white rounded p-1 px-2">Codigo: <span id="product-code" th:text="${cube.id}">2</span></span></p>
-                                </div>
-                                <div class="card-body" style="font-size: 1.3rem;">
-                                    <p class="card-subtitle">Vendido e entregue por <b class="text-nu-color">Cubershop</b>
-                                        <i class="fas fa-cubes fa-lg text-nu-color"></i>
+                                    <h3 class="ml-4" th:text="${cube.name}">2X2X2 QIDI COLOR</h3>
+                                    <p class="mt-1 ml-4">
+                                        <span class="bg-dark text-white rounded p-1 px-2">Codigo: <span id="product-code" th:text="${cube.id}">2</span></span>
                                     </p>
-                                    <p class="mt-3">
-                                        <i class="fas fa-bolt text-muted"></i>
-                                        <b class="text-nu-color">Pronta entrega</b>
-                                    </p>
+                                    <h1 class="ml-4 card-title text-info mt-4" th:text="${{cube.price}}">R$ 44,90</h1>
+                                    <h5 class="ml-4 text-muted" th:text="|${{cube.installment}} sem juros|">Até <b>3x</b> de <b>R$ 24,96</b> sem juros</h5>
+                                    <h5 class="ml-4 text-muted">ou <b th:text="${{cube.price}}">R$ 71,16</b> via depósito </h5>
                                 </div>
-                                <div class="card-body">
-                                    <ul class="list-group">
-                                        <li class="list-group-item d-flex justify-content-between">
-                                            <span>
-                                                <img src="/img/payments/band_visa.png"/>
-                                                <img src="/img/payments/band_master.png"/>
-                                                <img src="/img/payments/band_american.png"/>
-                                                <img src="/img/payments/band_hiper.png"/>
-                                                <img src="/img/payments/band_elo.png"/>
-                                            </span>
+                                <div class="card-body" style="margin-top: 0;">
+                                    <ul class="list-group rounded text-center mb-3" style="border-top: 3px solid rgb(138, 5, 190);" id="credit-cards">
+                                        <li class="list-group-item text-nu-color">
+                                            <i class="fas fa-credit-card fa-lg mr-2"></i>
+                                            <span class="h5">Parcelamentos</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between">
-                                            <span>
-                                                <img src="/img/payments/band_paypal.png"/>
-                                            </span>
-                                            <span><b th:text="${{cube.price}}">R$ 44,90</b><span class="text-muted"> a vista</span></span>
+                                        <li class="list-group-item">
+                                            <img src="/img/payments/band_visa.png" class="ml-2"/>
+                                            <img src="/img/payments/band_master.png" class="ml-2"/>
+                                            <img src="/img/payments/band_american.png" class="ml-2"/>
+                                            <img src="/img/payments/band_hiper.png" class="ml-2"/>
+                                            <img src="/img/payments/band_elo.png" class="ml-2"/>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between">
-                                            <span>
-                                                <img src="/img/payments/band_boleto.png"/>
-                                            </span>
+                                        <li class="list-group-item">
+                                            <span th:text="|${{cube.installment}} sem juros|">3x de R$ 14,96 sem juros</span>
+                                        </li>
+                                    </ul>
+
+                                    <ul class="list-group rounded text-center" style="border-top: 3px solid rgb(138, 5, 190);" id="payment-methods">
+                                        <li class="list-group-item text-nu-color">
+                                            <i class="fas fa-coins fa-lg mr-2"></i>
+                                            <span class="h5">À vista</span>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <img src="/img/payments/band_paypal.png" class="ml-2"/>
+                                            <img src="/img/payments/band_boleto.png" class="ml-2"/>
+                                            <img src="/img/payments/band_mercadopago.png" class="ml-2"/>
+                                        </li>
+                                        <li class="list-group-item">
                                             <span><b th:text="${{cube.price}}">R$ 44,90</b><span class="text-muted"> a vista</span></span>
                                         </li>
                                     </ul>
                                 </div>
                                 <div class="card-body">
-                                    <div class="input-group w-50">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text text-dark font-weight-bold" id="basic-addon1">Quantidade</span>
-                                        </div>
-                                        <input type="number" class="form-control" placeholder="0" aria-label="cube-amount" aria-describedby="Quantidade" min="0" max="100"/>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="h5">
+                                            <b class="text-muted">Status: </b>
+                                            <span class="text-success" th:class="${cube.stock ? 'text-success' : 'text-danger'}" th:text="${cube.stock ? 'Disponível' : 'Indisponivel'}">Disponível</span>
+                                        </span>
+                                        <span class="h5"><b class="text-muted">Quantity: </b><span class="text-info" th:text="${cube.quantity}">89</span></span>
+                                    </div>
+                                    <div class="input-group">
+                                        <button class="btn btn-outline-nu-color w-100" id="wishlistAddBtn" th:disabled="${!cube.stock}">Adicionar para a lista de desejos</button>
                                     </div>
                                     <div class="input-group mt-3">
                                         <div class="input-group-prepend">
@@ -107,10 +130,15 @@
                                             <button class="btn btn-outline-success">Consultar</button>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="card-body">
-                                    <button class="btn btn-lg btn-outline-nu-color w-100">Adicionar para a cesta</button>
-                                    <button class="btn btn-lg btn-outline-nu-color w-100 mt-3" id="wishlistAddBtn">Adicionar para a lista de desejos</button>
+                                    <div class="input-group mt-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text text-dark font-weight-bold" id="basic-addon1">Quantidade</span>
+                                        </div>
+                                        <input type="number" class="form-control" placeholder="0" aria-label="cube-amount" aria-describedby="Quantidade" min="0" max="100"/>
+                                        <div class="input-group-apprend">
+                                            <button class="btn btn-outline-nu-color w-100" th:disabled="${!cube.stock}">Adicionar para a cesta</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -118,7 +146,7 @@
                 </div>
             </div>
             <div class="row justify-content-center mt-5">
-                <div class="col-10 bg-white shadow border-nu-color p-5">
+                <div class="col-10 bg-white p-5">
                     <div>
                         <h4>Descrição:</h4>
                         <span class="text-muted">
@@ -161,6 +189,21 @@
                 indicators.appendChild(li);
             }
         }
+
+        description["makePayAnimations"] = () => {
+            const creditCards = document.querySelector("#credit-cards");
+            const paymentMethods = document.querySelector("#payment-methods");
+             const specs = document.querySelector("#specs");
+
+            creditCards.onmouseenter = () => creditCards.classList.add("shadow-lg");
+            creditCards.onmouseleave = () => creditCards.classList.remove("shadow-lg");
+
+            paymentMethods.onmouseenter = () => paymentMethods.classList.add("shadow-lg");
+            paymentMethods.onmouseleave = () => paymentMethods.classList.remove("shadow-lg");
+
+            specs.onmouseenter = () => specs.classList.add("shadow-lg");
+            specs.onmouseleave = () => specs.classList.remove("shadow-lg");
+        }
     </script>
 
     <script>
@@ -168,5 +211,6 @@
         description.validateFreteInput();
         description.carouselTrick();
         description.wishlistAddBtn();
+        description.makePayAnimations();
     </script>
 </html>

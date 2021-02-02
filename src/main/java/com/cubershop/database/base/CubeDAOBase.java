@@ -6,18 +6,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-public interface CubeDAOBase extends WishlistDAOBase {
+public interface CubeDAOBase {
 
-    void insertCube(Cube cube);
+    UUID saveCube(Cube cube);
 
     List<Cube> findHomeCubes();
 
     List<Cube> findCubesByType(String type);
 
-    List<Cube> findCubesByTypeAndOrder(String type, String order, String sort);
-
-    @Override
-    List<Cube> findCubesByIdList(String[] ids);
+    List<Cube> findCubesByTypeAndOrder(String type, String order);
 
     Cube findCubeById(UUID uuid);
 

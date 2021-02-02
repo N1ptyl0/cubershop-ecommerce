@@ -19,22 +19,64 @@
         <div class="container-fluid my-5" th:fragment="content">
             <span class="h3 text-center d-block">2x2x2</span>
             <hr class="mb-4 mt-0 bg-light w-75"/>
+
             <div class="row justify-content-center" th:fragment="card-row(list)">
-                <div class="col-md-3 mt-3 mt-md-0 d-flex justify-content-center" th:each="cube : ${list} ?: ${cubes['2x2x2']}">
-                    <div class="card border-nu-color shadow" style="width: 18rem;">
+                <div class="col-md-4 col-lg-3 mt-3 mt-md-0 d-flex justify-content-center" th:each="cube : ${list} ?: ${cubes['2x2x2']}">
+                    <div class="card p-3" style="width: 18rem;">
                         <div class="card-img-top-focus text-center">
                             <img th:src="@{|~/static/img/${cube.imageUUID[0]}|}" src="https://classteaching.files.wordpress.com/2019/09/rubiks-cube.jpg" class="card-img-top" alt="..."/>
                             <img th:src="@{|~/static/img/${cube.imageUUID[1]}|}" src="https://www.toysrus.ca/on/demandware.static/-/Sites-toys-master-catalog/default/dw67e729d7/images/2DDF7C75_1.jpg" class="card-img-top d-none" alt="..."/>
                         </div>
                         <div class="text-center text-dark mt-2">
-                            <span th:text="${cube.name}" class="h5">2X2X2 QIDI COLOR</span>
+                            <span class="h6"><b th:text="${cube.name}">3X3X3 TRADITIONAL SHENGSHOU</b></span>
                         </div>
                         <span class="text-center d-none mt-2 text-muted product-code" th:text="|Code: ${cube.id}|">Code: 2</span>
                         <div class="card-body text-center">
-                            <h2 class="card-title text-info mb-1" th:text="${{cube.price}}">R$ 44,90</h2>
+                            <h2 class="card-title text-info" th:text="${{cube.price}}">R$ 44,90</h2>
+                            <p class="text-muted h6"><b th:text="|Ou ${cube.installment}|">Ou até 3x de 14,96</b></p>
                         </div>
-                        <div class="text-center my-2 mb-2">
-                            <a class="btn btn-outline-nu-color w-75 mb-3" title="Comprar esse cubo" href="/description/3" th:href="@{|~/description/${cube.id}|}"><b>Comprar</b></a>
+                        <div class="text-center my-2">
+                            <a class="btn btn-outline-nu-color w-75" title="Comprar esse cubo" href="/description/3" th:href="@{|~/description/${cube.id}|}"><b>Comprar</b></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3 mt-3 mt-md-0 d-flex justify-content-center" th:each="cube : ${list} ?: ${cubes['2x2x2']}" th:remove="all">
+                    <div class="card p-3" style="width: 18rem;">
+                        <div class="card-img-top-focus text-center">
+                            <img th:src="@{|~/static/img/${cube.imageUUID[0]}|}" src="https://classteaching.files.wordpress.com/2019/09/rubiks-cube.jpg" class="card-img-top" alt="..."/>
+                            <img th:src="@{|~/static/img/${cube.imageUUID[1]}|}" src="https://www.toysrus.ca/on/demandware.static/-/Sites-toys-master-catalog/default/dw67e729d7/images/2DDF7C75_1.jpg" class="card-img-top d-none" alt="..."/>
+                        </div>
+                        <div class="text-center text-dark mt-2">
+                            <span class="h6"><b th:text="${cube.name}">3X3X3 TRADITIONAL SHENGSHOU</b></span>
+                        </div>
+                        <span class="text-center d-none mt-2 text-muted product-code" th:text="|Code: ${cube.id}|">Code: 2</span>
+                        <div class="card-body text-center">
+                            <h2 class="card-title text-info" th:text="${{cube.price}}">R$ 44,90</h2>
+                            <p class="text-muted h6"><b th:text="|Ou ${cube.installment}|">Ou até 3x de 14,96</b></p>
+                        </div>
+                        <div class="text-center my-2">
+                            <a class="btn btn-outline-nu-color w-75" title="Comprar esse cubo" href="/description/3" th:href="@{|~/description/${cube.id}|}"><b>Comprar</b></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-lg-3 mt-3 mt-md-0 d-flex justify-content-center" th:each="cube : ${list} ?: ${cubes['2x2x2']}" th:remove="all">
+                    <div class="card p-3" style="width: 18rem;">
+                        <div class="card-img-top-focus text-center">
+                            <img th:src="@{|~/static/img/${cube.imageUUID[0]}|}" src="https://classteaching.files.wordpress.com/2019/09/rubiks-cube.jpg" class="card-img-top" alt="..."/>
+                            <img th:src="@{|~/static/img/${cube.imageUUID[1]}|}" src="https://www.toysrus.ca/on/demandware.static/-/Sites-toys-master-catalog/default/dw67e729d7/images/2DDF7C75_1.jpg" class="card-img-top d-none" alt="..."/>
+                        </div>
+                        <div class="text-center text-dark mt-2">
+                            <span class="h6"><b th:text="${cube.name}">3X3X3 TRADITIONAL SHENGSHOU</b></span>
+                        </div>
+                        <span class="text-center d-none mt-2 text-muted product-code" th:text="|Code: ${cube.id}|">Code: 2</span>
+                        <div class="card-body text-center">
+                            <h2 class="card-title text-info" th:text="${{cube.price}}">R$ 44,90</h2>
+                            <p class="text-muted h6"><b th:text="|Ou ${cube.installment}|">Ou até 3x de 14,96</b></p>
+                        </div>
+                        <div class="text-center my-2">
+                            <a class="btn btn-outline-nu-color w-75" title="Comprar esse cubo" href="/description/3" th:href="@{|~/description/${cube.id}|}"><b>Comprar</b></a>
                         </div>
                     </div>
                 </div>

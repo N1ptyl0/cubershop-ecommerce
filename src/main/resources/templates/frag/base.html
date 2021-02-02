@@ -16,7 +16,7 @@
 
     <body class="bg-transparent" th:fragment="base(content, pageName)">
 
-        <header class="navbar navbar-expand-lg navbar-light px-4" th:fragment="header">
+        <header class="navbar navbar-expand-lg navbar-light px-4" th:fragment="header" th:if="${components.contains('header') || components.contains('all')}">
             <a class="navbar-brand text-center flex-sm-fill" href="/">
                 <div class="text-center">
                     <i class="fas fa-cubes fa-3x text-nu-color d-inline-block align-middle"></i>
@@ -29,14 +29,35 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbar-supported-content">
-                <form class="form-inline flex-fill mt-3 mx-5">
-                    <div class="input-group flex-fill">
-                        <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" id="search-input" data-container="body" data-triger="manual" data-html="true" data-placement="bottom"/>
+                <form class="form-inline flex-fill mt-3">
+                    <div class="input-group flex-fill dropdown">
+                        <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" id="search-input"/>
                         <div class="input-group-append">
-                            <button class="btn bg-nu-color" type="button">
+                            <button class="btn bg-nu-color dropdown-toggle" role="button" type="button" aria-haspopup="true" data-toggle="dropdown">
                                 <i class="fas fa-search fa-lg text-white"></i>
                             </button>
-                        </div>
+
+                            <div class="dropdown-menu w-100" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </div>    
                     </div>
                 </form>
 
@@ -65,7 +86,7 @@
                                     <div class="dropdown-divider"></div>
                                 <a class="btn dropdown-item-text user-dropdown-action-btn font-weight-bold text-left">Cadastrar</a>
                                     <div class="dropdown-divider"></div>
-                                <a class="btn dropdown-item-text user-dropdown-action-btn font-weight-bold text-left" href="/insert-cube-form.html" th:href="@{|~/form/insertCube|}">Adicionar Novo Cubo</a>
+                                <a class="btn dropdown-item-text user-dropdown-action-btn font-weight-bold text-left" href="/save-cube-form.html" th:href="@{|~#{route.cube.form}|}">Adicionar Novo Cubo</a>
                             </div>
                         </div>
                     </li>
@@ -82,15 +103,15 @@
             </div>
         </header>
 
-        <nav class="nav bg-nu-color nav-justified sticky-top" style="z-index: 1;" th:fragment="nav">
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="'/catalog/2x2x2?order=alpha&sort=asc'" href="/catalog.html">2x2x2</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="'/catalog/3x3x3?order=alpha&sort=asc'" href="/catalog.html">3x3x3</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="'/catalog/4x4x4?order=alpha&sort=asc'" href="/catalog.html">4x4x4</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="'/catalog/5x5x5?order=alpha&sort=asc'" href="/catalog.html">5x5x5</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="'/catalog/big?order=alpha&sort=asc'" href="/catalog.html">Big Cubes</a>
+        <nav class="nav bg-nu-color nav-justified sticky-top" style="z-index: 2;" th:fragment="nav" th:if="${components.contains('nav') || components.contains('all')}">
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('2x2x2')}" href="/category.html">2x2x2</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('3x3x3')}" href="/category.html">3x3x3</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('4x4x4')}" href="/category.html">4x4x4</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('5x5x5')}" href="/category.html">5x5x5</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('big')}" href="/category.html">Big Cubes</a>
         </nav>
 
-        <div class="jumbotron p-3 text-center m-0 border border-secondary border-left-0 border-right-0 rounded-0" th:fragment="plus">
+        <div class="jumbotron p-3 text-center m-0 border border-secondary border-left-0 border-right-0 rounded-0" th:fragment="plus" th:if="${components.contains('plus') || components.contains('all')}">
             <div class="row">
                 <div class="col-md-6 col-lg-3">
                     <i class="fas fa-shipping-fast fa-2x text-nu-color d-inline-block align-middle"></i>
@@ -111,7 +132,7 @@
             </div>
         </div>
 
-        <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="2000" th:fragment="carrousel">
+        <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="2000" th:fragment="carrousel" th:if="${components.contains('carousel') || components.contains('all')}">
             <div class="carousel-inner">
                 <div class="carousel-item active">
                     <img src="/img/banners/carousel-cuber-1.png" class="d-block w-100" alt="..."/>
@@ -148,7 +169,7 @@
 
         <div th:replace="${content}"></div>
 
-        <div class="jumbotron p-3 text-center m-0 border border-secondary border-left-0 border-right-0 rounded-0 bg-nu-color" th:fragment="newsletter">
+        <div class="jumbotron p-3 text-center m-0 border border-secondary border-left-0 border-right-0 rounded-0 bg-nu-color" th:fragment="newsletter" th:if="${components.contains('news') || components.contains('all')}">
             <span class="text-white my-3 h3">Receba todas as nossas ofertas e novidades em seu e-mail</span>
             <form class="form-inline">
                 <input type="text" class="form-control flex-fill" placeholder="Your name"/>
@@ -157,12 +178,12 @@
             </form>
         </div>
 
-        <footer class="container-fluid my-3" th:fragment="footer">
+        <footer class="container-fluid my-3" th:fragment="footer" th:if="${components.contains('footer') || components.contains('all')}">
             <div class="row">
                 <div class="col-sm-4">
                     <ul style="list-style-type: none;">
                         <dl class="text-nu-color mb-2"><b class="h3">Intitucional</b></dl>
-                        <li><a class="text-dark" href="#">Sobre a Wear Shop</a></li>
+                        <li><a class="text-dark" href="#">Sobre a CuberShop</a></li>
                         <li><a class="text-dark" href="#">Termos de Segurança</a></li>
                         <li><a class="text-dark" href="#">Imprensa</a></li>
                         <li><a class="text-dark" href="#">Mapa do Site</a></li>

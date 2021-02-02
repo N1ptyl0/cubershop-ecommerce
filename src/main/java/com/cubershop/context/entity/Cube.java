@@ -9,22 +9,46 @@ public final class Cube implements Comparable<Cube> {
     private int size;
     private UUID id;
     private Price price;
-    private String name, type, description;
+    private String name, type, description, brand, colorPattern;
     private UUID[] imageUUID;
     private List<MultipartFile> imageFile;
-    private Brand brand;
-    private ColorPattern colorPattern;
+    private Installment installment;
+    private int quantity;
+    private boolean stock, magnetic;
 
     public Cube() {
         this.id = UUID.randomUUID();
         this.size = 50;
         this.price = new Price();
-        this.name = this.type = this.description = "";
+        this.name = this.type = this.description = this.brand = this.colorPattern = "";
         this.imageUUID = new UUID[]{UUID.randomUUID()};
         //noinspection unchecked
         this.imageFile = Collections.EMPTY_LIST;
-        this.brand = Brand.FELLOW;
-        this.colorPattern = ColorPattern.BEAUTY;
+        this.installment = new Installment(this.price, 3);
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public boolean getStock() {
+        return stock;
+    }
+
+    public void setStock(boolean stock) {
+        this.stock = stock;
+    }
+
+    public boolean getMagnetic() {
+        return magnetic;
+    }
+
+    public void setMagnetic(boolean magnetic) {
+        this.magnetic = magnetic;
     }
 
     public String getDescription() {
@@ -43,19 +67,19 @@ public final class Cube implements Comparable<Cube> {
         this.price = price;
     }
 
-    public Brand getBrand() {
+    public String getBrand() {
         return brand;
     }
 
-    public void setBrand(Brand brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 
-    public ColorPattern getColorPattern() {
+    public String getColorPattern() {
         return colorPattern;
     }
 
-    public void setColorPattern(ColorPattern colorPattern) {
+    public void setColorPattern(String colorPattern) {
         this.colorPattern = colorPattern;
     }
 
@@ -107,6 +131,14 @@ public final class Cube implements Comparable<Cube> {
         this.id = id;
     }
 
+    public Installment getInstallment() {
+        return installment;
+    }
+
+    public void setInstallment(Installment installment) {
+        this.installment = installment;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(Objects.isNull(obj) || !(obj instanceof Cube)) return false;
@@ -119,7 +151,10 @@ public final class Cube implements Comparable<Cube> {
         && this.type.equals(cube.getType()) && this.brand.equals(cube.getBrand())
         && this.colorPattern.equals(cube.getColorPattern())
         && Arrays.equals(this.imageUUID, cube.getImageUUID())
-        && this.imageFile.equals(cube.getImageFile());
+        && this.imageFile.equals(cube.getImageFile())
+        && this.installment.equals(cube.getInstallment())
+        && this.quantity == cube.getQuantity() && this.stock == cube.getStock()
+        && this.magnetic == cube.getMagnetic();
     }
 
     @Override

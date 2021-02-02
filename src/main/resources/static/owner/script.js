@@ -22,23 +22,44 @@ const header = {
 	},
 
 	searchInputPredictionsPopover: () => {
-		let text = "";
 		const searchInput = document.querySelector("#search-input");
 
-		searchInput.onkeyup = () => {
-			const value = searchInput.value;
+		// searchInput.onkeyup = () => {
+		// 	let html = ""
+		// 	const value = searchInput.value;
 
-			if(value.length < 3) {
-				$("#search-input").popover("hide");
-				return;
-			}
+		// 	if(value.length < 3) {
+		// 		$("#search-input").popover("hide");
+		// 		return;
+		// 	}
 
-			text = `<a class='d-block cursor-pointer-hover mb-2' href='/base.html'>${value}</a>`.repeat(10);
+		// 	html =
+		// 	`
+		// 		<div class="btn-group-vertical">
+		// 			<a class="btn btn-primary">one button</a>
+		// 			<a class="btn btn-primary">one button</a>
+		// 			<a class="btn btn-primary">one button</a>
+		// 			<a class="btn btn-primary">one button</a>
+		// 			<a class="btn btn-primary">one button</a>
+		// 			<a class="btn btn-primary">one button</a>
+		// 			<a class="btn btn-primary">one button</a>
+		// 			<a class="btn btn-primary">one button</a>
+		// 		</div>
+		// 	`
+		// 	// html =
+		// 	// `
+		// 	// 	<a class="btn btn-primary w-100">one a</a>
+		// 	// `
 
-			searchInput.setAttribute("data-content", text);
+		// 	searchInput.setAttribute("data-content", html);
 
-			$("#search-input").popover("show");
-		};
+		// 	$("#search-input").popover("show");
+		// };
+		window.onload = () => {
+			setTimeout(function() {
+				$(".dropdown-toggle").dropdown("toggle");
+			}, 1);
+		}
 	}
 };
 

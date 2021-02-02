@@ -1,7 +1,5 @@
 package com.cubershop.context.validation;
 
-import com.cubershop.context.entity.Brand;
-import com.cubershop.context.entity.ColorPattern;
 import com.cubershop.context.entity.Cube;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -72,17 +70,18 @@ public final class CubeValidation implements Validator {
         if(cube.getBrand() == null)
             errors.rejectValue("brand",
                 "cube.brand.empty", "Brand can not be empty");
-//        if(Stream.<Brand>of(Brand.values())
-//            .noneMatch(v -> v.equals(cube.getBrand())))
-//            errors.rejectValue("type", "cube.type.not.exist", "Brand not acceptable");
+        else if(cube.getBrand().length() < 3)
+            errors.rejectValue("brand", "cube.brand.too.small", "Brand can not be too small");
+        else if(cube.getBrand().length() > 100)
+            errors.rejectValue("brand", "cube.brand.too.long", "Brand can not be too long");
 
         if(cube.getColorPattern() == null)
             errors.rejectValue("colorPattern",
-                    "cube.colorPattern.empty", "Color pattern can not be empty");
-//        if(Stream.<ColorPattern>of(ColorPattern.values())
-//                .noneMatch(v -> v.equals(cube.getColorPattern())))
-//            errors.rejectValue("colorPattern",
-//                "cube.colorPattern.not.exist", "Color pattern not acceptable");
+                "cube.colorPattern.empty", "Color pattern can not be empty");
+        else if(cube.getColorPattern().length() < 4)
+            errors.rejectValue("colorPattern", "cube.colorPattern.too.small", "ColorPattern can not be too small");
+        else if(cube.getColorPattern().length() > 25)
+            errors.rejectValue("colorPattern", "cube.colorPattern.too.long", "ColorPattern can not be too long");
 
         if(cube.getImageFile().stream().anyMatch(v -> {
             try {
