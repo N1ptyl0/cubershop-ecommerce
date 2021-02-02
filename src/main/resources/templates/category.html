@@ -12,9 +12,10 @@
         
 	    <!-- owner CSS -->
 	    <link rel="stylesheet" href="/owner/style.css"/>
+        <link rel="stylesheet" href="/owner/dropdown.css"/>
 	</head>
 
-	<body class="bg-transparent" th:replace="~{frag/base :: base(~{::content}, 'Category')}">
+	<body class="bg-transparent" th:replace="~{frag/base :: base(~{::content}, (${isSearchPage} ? 'Search' : 'Category'))}">
 
         <div class="container-fluid my-5" th:fragment="content">
         	<hr class="mt-0 bg-dark w-75"/>

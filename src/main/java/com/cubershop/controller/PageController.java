@@ -1,6 +1,6 @@
 package com.cubershop.controller;
 
-import com.cubershop.database.dao.CubeDAO;
+import com.cubershop.database.base.CubeDAOBase;
 import com.cubershop.context.utils.ListProcessor;
 import com.cubershop.context.entity.Cube;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,16 +8,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.BindingResult;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 @Controller
 public final class PageController {
 
     @Autowired
-    private CubeDAO cubeDAO;
+    private CubeDAOBase cubeDAO;
 
     @RequestMapping(method = RequestMethod.GET, path = {"/", "/home", "/index"}, produces = MediaType.TEXT_HTML_VALUE)
     public String homePage(@RequestParam Map<String, String> params, Model model) {
@@ -50,6 +48,7 @@ public final class PageController {
             && !order.equals("price_asc") && !order.equals("price_desc"))
                 return "error/400";
 
+        model.addAttribute("isSearchPage", false);
         model.addAttribute("selectedOrder", order);
         model.addAttribute("category", category);
         model.addAttribute("cubeList",
@@ -71,11 +70,23 @@ public final class PageController {
         return "description";
     }
 
-    @GetMapping(path = "/form/cube", produces = MediaType.TEXT_HTML_VALUE)
-    public String cubeFormPage(@ModelAttribute Cube cube, BindingResult bindingResult, Model model) {
-        model.addAttribute("categories",
-            new String[]{"2x2x2", "3x3x3", "4x4x4", "5x5x5", "big"});
+    @GetMapping(value = "/search", produces = MediaType.TEXT_HTML_VALUE, params = "exp")
+    public String searchPage(
+    @RequestParam(name = "exp", defaultValue = "") String expression,
+    @RequestParam(name = "order", defaultValue = "alpha_asc") String order, Model model) {
+        if(!order.equals("alpha_asc") && !order.equals("alpha_desc")
+            && !order.equals("price_asc") && !order.equals("price_desc"))
+            return "error/400";
 
-        return "cube-form";
+        List<Cube> cubes = this.cubeDAO.findCubesByExpressionAndOrder(expression, order);
+
+        model.addAttribute("isSearchPage", true);
+        model.addAttribute("selectedOrder", order);
+        model.addAttribute("category", "Results for "+expression);
+        model.addAttribute("cubeList", ListProcessor.<Cube>groupBy(cubes,3));
+//        model.addAttribute("components", List.<String>of("all"));
+        model.addAttribute("components", List.<String>of("header", "nav", "news", "footer"));
+
+        return "category";
     }
 }

@@ -46,7 +46,7 @@ public final class CubeDAOTest {
     }
 
     @Test
-    public void insertCube_without_mageFile_test() {
+    public void saveCube_without_mageFile_test() {
        Cube cube = new Cube();
 
        when(this.jdbcTemplate.queryForObject(
@@ -58,7 +58,10 @@ public final class CubeDAOTest {
            anyString(),
            anyString(),
            anyInt(),
-           anyString()
+           anyString(),
+           anyBoolean(),
+           anyBoolean(),
+           anyInt()
        )).thenReturn(UUID.randomUUID());
 
         when(this.jdbcTemplate.batchUpdate(anyString(), any(BatchPreparedStatementSetter.class)))
@@ -67,34 +70,40 @@ public final class CubeDAOTest {
         cubeDAO.saveCube(cube);
 
         verify(this.jdbcTemplate, times(1)).queryForObject(
-           anyString(),
-           eq(UUID.class),
-           anyString(),
-           anyDouble(),
-           anyString(),
-           anyString(),
-           anyString(),
-           anyInt(),
-           anyString()
+            anyString(),
+            eq(UUID.class),
+            anyString(),
+            anyDouble(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyString(),
+            anyBoolean(),
+            anyBoolean(),
+            anyInt()
        );
        verify(this.jdbcTemplate, never()).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
     }
 
     @Test
-    public void insertCube_with_ImageFile_test()  {
+    public void saveCube_with_ImageFile_test()  {
         Cube cube = new Cube();
         cube.setImageFile(List.<MultipartFile>of(new MockMultipartFile("noname", new byte[]{})));
 
         when(this.jdbcTemplate.queryForObject(
-           anyString(),
-           eq(UUID.class),
-           anyString(),
-           anyDouble(),
-           anyString(),
-           anyString(),
-           anyString(),
-           anyInt(),
-           anyString()
+            anyString(),
+            eq(UUID.class),
+            anyString(),
+            anyDouble(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyString(),
+            anyBoolean(),
+            anyBoolean(),
+            anyInt()
         )).thenReturn(UUID.randomUUID());
 
         when(this.jdbcTemplate.batchUpdate(anyString(), any(BatchPreparedStatementSetter.class)))
@@ -111,7 +120,10 @@ public final class CubeDAOTest {
             anyString(),
             anyString(),
             anyInt(),
-            anyString()
+            anyString(),
+            anyBoolean(),
+            anyBoolean(),
+            anyInt()
         );
         verify(this.jdbcTemplate, times(1)).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
     }
@@ -199,5 +211,38 @@ public final class CubeDAOTest {
         assertArrayEquals(expectedBytes, resultingBytes);
 
         verify(this.jdbcTemplate, times(1)).queryForObject(anyString(), eq(byte[].class), any(UUID.class));
+    }
+
+    @Test
+    public void findNamesByExpression_test() {
+        List<String> expectedList = List.<String>of("name 1", "name 2", "name 3");
+
+        when(this.jdbcTemplate.queryForList(anyString(), eq(String.class), anyString()))
+            .thenReturn(expectedList);
+
+        List<String> resultingList = this.cubeDAO.findNamesByExpression("exp");
+
+        assertEquals(3, resultingList.size(), "Size of the resulting list");
+        assertArrayEquals(
+            expectedList.toArray(String[]::new),
+            resultingList.toArray(String[]::new),
+            "Equality of the lists"
+        );
+
+        verify(this.jdbcTemplate, times(1)).queryForList(anyString(), eq(String.class), anyString());
+    }
+
+    @Test
+    public void findCubesByExpressionAndOrder_test() {
+        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube());
+
+        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
+            .thenReturn(expectedList);
+
+        List<Cube> resultingList = this.cubeDAO.findCubesByExpressionAndOrder("exp", "price_desc");
+
+        assertEquals(2, resultingList.size(), "Size of the resulting list");
+
+        verify(this.jdbcTemplate, times(1)).query(anyString(), any(RowMapper.class), anyString());
     }
 }

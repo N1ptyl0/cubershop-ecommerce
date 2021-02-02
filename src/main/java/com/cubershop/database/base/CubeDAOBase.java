@@ -19,4 +19,8 @@ public interface CubeDAOBase {
     Cube findCubeById(UUID uuid);
 
     byte[] findImageById(UUID uuid);
+
+    List<Cube> findCubesByExpressionAndOrder(String expression, String order);
+
+    List<String> findNamesByExpression(String expression);
 }

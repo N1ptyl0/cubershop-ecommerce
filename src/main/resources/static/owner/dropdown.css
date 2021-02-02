@@ -1,0 +1,22 @@
+.my-dropdown > .dropdown-content {
+	position: absolute;
+	z-index: 3;
+	display: none;
+	background-color: white;
+	margin-top: 40px;
+	box-sizing: border-box;
+	padding: 10px;
+	border-radius: 8px;
+
+}
+
+.dropdown-content > a {
+	display: block;
+	text-decoration: none;
+	color: black;
+	padding: 3px;
+}
+
+.dropdown-content > a:hover {
+	background-color: #f1f1f1;
+}

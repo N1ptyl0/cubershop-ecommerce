@@ -21,44 +21,57 @@ const header = {
 		}
 	},
 
-	searchInputPredictionsPopover: () => {
+	searchDropdown: (action) => {
+		const dropdown = document.querySelector(".my-dropdown > .dropdown-content");
+
+		if(action == "show")
+			dropdown.style.display = "block";
+		else if(action == "hide")
+			dropdown.style.display = "none";
+	},
+
+	searchInputPredictions: () => {
+		const searchInput = document.querySelector("#search-input");
+		const dropdown = document.querySelector(".my-dropdown > .dropdown-content");
+
+		searchInput.onkeyup = searchInput.onchange = () => {
+			const value = searchInput.value;
+
+			if(value.length >= 3) {
+				$.get(
+					`${window.location.origin}/api/cube/names?exp=${value}`,
+					(names) => {
+						dropdown.innerHTML = "";
+			
+						for(let e of names) {
+							let a = document.createElement("a");
+							a.href = "#";
+							a.innerHTML = e.replace(value.trim(), `<b class="text-nu-color">${value}</b>`)
+
+							dropdown.appendChild(a);
+						}
+
+						header.searchDropdown("show");
+					}
+				);
+			}
+			else header.searchDropdown("hide");
+
+		};
+	},
+
+	loadSearchEngine: () => {
+		header.searchInputPredictions();
+
 		const searchInput = document.querySelector("#search-input");
 
-		// searchInput.onkeyup = () => {
-		// 	let html = ""
-		// 	const value = searchInput.value;
+		document.querySelector("#search-btn").onclick = () => {
+			window.location = `/search?exp=${searchInput.value}`;
+		}
 
-		// 	if(value.length < 3) {
-		// 		$("#search-input").popover("hide");
-		// 		return;
-		// 	}
-
-		// 	html =
-		// 	`
-		// 		<div class="btn-group-vertical">
-		// 			<a class="btn btn-primary">one button</a>
-		// 			<a class="btn btn-primary">one button</a>
-		// 			<a class="btn btn-primary">one button</a>
-		// 			<a class="btn btn-primary">one button</a>
-		// 			<a class="btn btn-primary">one button</a>
-		// 			<a class="btn btn-primary">one button</a>
-		// 			<a class="btn btn-primary">one button</a>
-		// 			<a class="btn btn-primary">one button</a>
-		// 		</div>
-		// 	`
-		// 	// html =
-		// 	// `
-		// 	// 	<a class="btn btn-primary w-100">one a</a>
-		// 	// `
-
-		// 	searchInput.setAttribute("data-content", html);
-
-		// 	$("#search-input").popover("show");
-		// };
-		window.onload = () => {
-			setTimeout(function() {
-				$(".dropdown-toggle").dropdown("toggle");
-			}, 1);
+		searchInput.onkeyup = () => {
+			if(event.key == "Enter")
+				window.location = `/search?exp=${searchInput.value}`;
 		}
 	}
 };

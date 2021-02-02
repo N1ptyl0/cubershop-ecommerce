@@ -4,10 +4,9 @@ import com.cubershop.CubershopApplication;
 import com.cubershop.context.entity.Cube;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.cubershop.database.base.CubeDAOBase;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,7 +28,7 @@ import java.util.stream.IntStream;
 public class CubeDAOIntegrationTest {
 
     @Autowired
-    private CubeDAO cubeDAO;
+    private CubeDAOBase cubeDAO;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -173,5 +172,19 @@ public class CubeDAOIntegrationTest {
         byte[] bytes = this.cubeDAO.findImageById(UUID.fromString("84437a46-f737-4e48-ab2f-7bb52a16270e"));
 
         Assertions.assertThat(bytes).isNotNull();
+    }
+
+    @Test
+    public void findNamesByExpression_must_not_be_null() {
+        List<String> result = this.cubeDAO.findNamesByExpression("warrior");
+
+        Assertions.assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void findCubesByExpressionAndOrder_must_not_be_null() {
+        List<Cube> result = this.cubeDAO.findCubesByExpressionAndOrder("warrior", "price_desc");
+
+        Assertions.assertThat(result).isNotNull();
     }
 }

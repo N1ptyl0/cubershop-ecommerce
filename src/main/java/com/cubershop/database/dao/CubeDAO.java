@@ -174,4 +174,27 @@ public class CubeDAO implements CubeDAOBase {
 
         return this.jdbcTemplate.queryForObject(sql, byte[].class, uuid);
     }
+
+    @Override
+    public List<String> findNamesByExpression(String expression) {
+        String sql = "SELECT LOWER(name) FROM cube WHERE name LIKE ? LIMIT 8;";
+        return this.jdbcTemplate.queryForList(sql, String.class,
+            expression.isEmpty() ? "" : "%"+expression.toUpperCase()+"%");
+    }
+
+    @Override
+    public List<Cube> findCubesByExpressionAndOrder(String expression, String order) {
+        String[] parse = order.split("_");
+        parse[0] = "c."+(parse[0].equals("alpha") ? "name" : parse[0]);
+        parse[1] = parse[1].toUpperCase();
+
+        String sql =
+        "SELECT c.*, ARRAY_AGG(i.id) AS source FROM cube AS c "+
+        "INNER JOIN image AS i ON c.id = i.cube_id WHERE c.name LIKE ? "+
+        "GROUP BY c.id "+
+        String.format("ORDER BY %s %s;", parse[0], parse[1]);
+
+        return jdbcTemplate.query(sql, this::rowMapper,
+            expression.isEmpty() ? "" : "%"+expression.toUpperCase()+"%");
+    }
 }
