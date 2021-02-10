@@ -1,15 +1,19 @@
 package com.cubershop.controller;
 
 import com.cubershop.database.base.CubeDAOBase;
-import com.cubershop.context.utils.ListProcessor;
 import com.cubershop.context.entity.Cube;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.UUID;
+
+import static java.util.stream.Collectors.*;
 
 @Controller
 public final class PageController {
@@ -23,19 +27,7 @@ public final class PageController {
 
         List<Cube> cubes = this.cubeDAO.findHomeCubes();
 
-        model.addAttribute("cubes",
-            new HashMap<String, Cube[]>() {
-                {
-                    String[] types = {"2x2x2", "3x3x3", "4x4x4", "5x5x5"};
-
-                    for(final String t : types) {
-                        put(t, cubes.stream()
-                            .filter(e -> e.getType().equals(t))
-                            .toArray(Cube[]::new));
-                    }
-                }
-            }
-        );
+        model.addAttribute("cubes", cubes.stream().collect(groupingBy(Cube::getType, toSet())));
         model.addAttribute("components", List.<String>of("all"));
 
         return "home";
@@ -52,7 +44,7 @@ public final class PageController {
         model.addAttribute("selectedOrder", order);
         model.addAttribute("category", category);
         model.addAttribute("cubeList",
-            ListProcessor.<Cube>groupBy(this.cubeDAO.findCubesByTypeAndOrder(category, order),3)
+            Lists.partition(this.cubeDAO.findCubesByTypeAndOrder(category, order),3)
         );
         model.addAttribute("components", List.<String>of("all"));
 
@@ -83,7 +75,7 @@ public final class PageController {
         model.addAttribute("isSearchPage", true);
         model.addAttribute("selectedOrder", order);
         model.addAttribute("category", "Results for "+expression);
-        model.addAttribute("cubeList", ListProcessor.<Cube>groupBy(cubes,3));
+        model.addAttribute("cubeList", Lists.partition(cubes, 3));
 //        model.addAttribute("components", List.<String>of("all"));
         model.addAttribute("components", List.<String>of("header", "nav", "news", "footer"));
 
