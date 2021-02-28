@@ -34,28 +34,38 @@ const header = {
 		const searchInput = document.querySelector("#search-input");
 		const dropdown = document.querySelector(".my-dropdown > .dropdown-content");
 
-		searchInput.onkeyup = searchInput.onchange = () => {
+		let time = null;
+
+		searchInput.onkeyup = () => {
 			const value = searchInput.value;
 
+			if(time) clearTimeout(time);
+
 			if(value.length >= 3) {
-				$.get(
-					`${window.location.origin}/api/cube/names?exp=${value}`,
-					(names) => {
-						dropdown.innerHTML = "";
-			
-						for(let e of names) {
-							let a = document.createElement("a");
-							a.href = "#";
-							a.innerHTML = e.replace(value.trim(), `<b class="text-nu-color">${value}</b>`)
+				time = setTimeout( () => {
+					$.get(
+						`${window.location.origin}/api/cube/names?exp=${value}`,
+						(names) => {
+							dropdown.innerHTML = "";
+				
+							for(let e of names) {
+								let a = document.createElement("a");
+								a.href = "#";
+								a.innerHTML = e.replace(value.trim(), `<b class="text-nu-color">${value}</b>`)
 
-							dropdown.appendChild(a);
+								dropdown.appendChild(a);
+							}
+
+							header.searchDropdown("show");
 						}
+					);
+				}, 1000)
 
-						header.searchDropdown("show");
-					}
-				);
+				console.log("within if")
 			}
 			else header.searchDropdown("hide");
+
+			console.log("out if but whithin onkeyup")
 
 		};
 	},

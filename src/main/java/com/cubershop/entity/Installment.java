@@ -1,4 +1,4 @@
-package com.cubershop.context.entity;
+package com.cubershop.entity;
 
 public final class Installment implements Comparable<Installment> {
 

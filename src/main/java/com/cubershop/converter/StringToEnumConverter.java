@@ -1,4 +1,4 @@
-package com.cubershop.context.converter;
+package com.cubershop.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;

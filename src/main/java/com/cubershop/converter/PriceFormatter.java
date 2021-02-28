@@ -1,6 +1,6 @@
-package com.cubershop.context.converter;
+package com.cubershop.converter;
 
-import com.cubershop.context.entity.Price;
+import com.cubershop.entity.Price;
 import org.springframework.format.Formatter;
 
 import java.text.ParseException;

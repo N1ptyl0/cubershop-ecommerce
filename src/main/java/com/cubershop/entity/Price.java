@@ -1,5 +1,13 @@
-package com.cubershop.context.entity;
+package com.cubershop.entity;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.lang.NonNull;
+
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Price implements Comparable<Price> {
 
     private double value;
@@ -8,24 +16,8 @@ public class Price implements Comparable<Price> {
         this.value = 69;
     }
 
-    public double getValue() {
-        return value;
-    }
-
-    public void setValue(double value) {
-        this.value = value;
-    }
-
     @Override
-    public boolean equals(Object obj) {
-        if(obj == null || !(obj instanceof Price)) return false;
-        if(this == obj) return false;
-
-        return ((Price) obj).getValue() == this.value;
-    }
-
-    @Override
-    public int compareTo(Price price) {
+    public int compareTo(@NonNull Price price) {
         if(this.equals(price)) return 0;
         return (int)(this.value - price.getValue());
     }

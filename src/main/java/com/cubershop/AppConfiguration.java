@@ -1,7 +1,7 @@
 package com.cubershop;
 
-import com.cubershop.context.converter.*;
-import com.cubershop.context.validation.CubeValidation;
+import com.cubershop.converter.*;
+import com.cubershop.validation.CubeValidation;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;

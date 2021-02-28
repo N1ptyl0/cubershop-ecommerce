@@ -1,7 +1,10 @@
 package com.cubershop.controller;
 
-import com.cubershop.context.entity.Cube;
-import com.cubershop.database.base.CubeDAOBase;
+import com.cubershop.entity.Cube;
+import com.cubershop.database.template.CubeDAOTemplate;
+import com.cubershop.exception.CubeNotFoundException;
+import com.cubershop.exception.EmptyParameterValueException;
+import com.cubershop.exception.NumberOfParametersExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,12 +15,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class CubeController {
 
     @Autowired
-    private CubeDAOBase cubeDAO;
+    private CubeDAOTemplate cubeDAO;
 
     @GetMapping(path = "/form/cube", produces = MediaType.TEXT_HTML_VALUE)
     public String cubeFormPage(@ModelAttribute Cube cube, BindingResult bindingResult, Model model) {
@@ -41,15 +46,21 @@ public class CubeController {
         return "success";
     }
 
-    @GetMapping(path = "/api/cube/names",
+    @GetMapping(path = "/search/cube/names",
         produces = MediaType.APPLICATION_JSON_VALUE,
         params = "exp"
     )
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @CrossOrigin
-    public List<String> searchNamesList(
-        @RequestParam(name = "exp", defaultValue = "") String exp) {
-        return this.cubeDAO.findNamesByExpression(exp);
+    public List<String> searchNames(
+        @RequestParam(name = "exp", defaultValue = "") String expression,
+        @RequestParam Map<String, String> params) throws Exception {
+        if(expression.isEmpty()) throw new EmptyParameterValueException("exp");
+        if(params.size() > 1) throw new NumberOfParametersExceededException();
+
+        return this.cubeDAO.findCubesByName(expression)
+            .orElseThrow(() -> new CubeNotFoundException(expression))
+            .stream().map(Cube::getName).collect(Collectors.toList());
     }
 }
