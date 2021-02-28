@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: default, dev
+    active: default, prod
 
 
 org:
