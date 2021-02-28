@@ -1,97 +1,62 @@
 package com.cubershop.database.dao;
 
-import com.cubershop.context.entity.Cube;
+import com.cubershop.database.template.CubeDAOTemplate;
+import com.cubershop.entity.Cube;
+import com.cubershop.helpers.CubeHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public final class CubeDAOTest {
+@SuppressWarnings({"OptionalGetWithoutIsPresent", "unchecked"})
+final class CubeDAOTest {
 
     private JdbcTemplate jdbcTemplate;
-    private CubeDAO cubeDAO;
+    private CubeDAOTemplate cubeDAO;
 
     @BeforeEach
-    public void init() {
+    void setup() {
         this.jdbcTemplate = mock(JdbcTemplate.class);
         this.cubeDAO = new CubeDAO(jdbcTemplate);
     }
 
     @Test
-    public void findHomeCubes_test() {
+    void whenFindHomeCubesIsInvokedThenReturnsListCorrectly() {
         // given
-        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube(), new Cube(), new Cube(), new Cube());
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
 
-        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class)))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
             .thenReturn(expectedList);
 
         // when
-        List<Cube> resultingList = this.cubeDAO.findHomeCubes();
+        List<Cube> actualList = this.cubeDAO.findHomeCubes().get();
 
         // then
-        assertEquals(5, resultingList.size(), "size of resulting list");
-        assertEquals(expectedList, resultingList, "Resulting list equals to expected list");
+        assertThat(actualList)
+            .as("Empty check").isNotEmpty()
+            .as("Null check").isNotNull()
+            .as("Size of actual list").hasSize(5)
+            .extracting("name", String.class)
+            .as("Validation of the list")
+                .containsExactly("Blue cube", "Yellow cube", "Green cube", "Pink cube", "Red cube");
 
-        verify(this.jdbcTemplate, times(1)).query(anyString(), any(RowMapper.class));
+        verify(jdbcTemplate, times(1)).query(anyString(), any(RowMapper.class));
     }
 
     @Test
-    public void saveCube_without_mageFile_test() {
-       Cube cube = new Cube();
-
-       when(this.jdbcTemplate.queryForObject(
-           anyString(),
-           eq(UUID.class),
-           anyString(),
-           anyDouble(),
-           anyString(),
-           anyString(),
-           anyString(),
-           anyInt(),
-           anyString(),
-           anyBoolean(),
-           anyBoolean(),
-           anyInt()
-       )).thenReturn(UUID.randomUUID());
-
-        when(this.jdbcTemplate.batchUpdate(anyString(), any(BatchPreparedStatementSetter.class)))
-            .thenReturn(new int[]{1});
-
-        cubeDAO.saveCube(cube);
-
-        verify(this.jdbcTemplate, times(1)).queryForObject(
-            anyString(),
-            eq(UUID.class),
-            anyString(),
-            anyDouble(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyInt(),
-            anyString(),
-            anyBoolean(),
-            anyBoolean(),
-            anyInt()
-       );
-       verify(this.jdbcTemplate, never()).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
-    }
-
-    @Test
-    public void saveCube_with_ImageFile_test()  {
-        Cube cube = new Cube();
-        cube.setImageFile(List.<MultipartFile>of(new MockMultipartFile("noname", new byte[]{})));
-
-        when(this.jdbcTemplate.queryForObject(
+    void whenSaveCubeIsInvokedWithNullCubeThenDoNothingAndReturnsNullUUID() {
+        // given
+        when(jdbcTemplate.queryForObject(
             anyString(),
             eq(UUID.class),
             anyString(),
@@ -106,12 +71,16 @@ public final class CubeDAOTest {
             anyInt()
         )).thenReturn(UUID.randomUUID());
 
-        when(this.jdbcTemplate.batchUpdate(anyString(), any(BatchPreparedStatementSetter.class)))
-           .thenReturn(new int[]{1});
+        when(this.jdbcTemplate.batchUpdate(anyString(),
+            any(BatchPreparedStatementSetter.class))).thenReturn(new int[]{});
 
-        cubeDAO.saveCube(cube);
+        // when
+        UUID uuid = cubeDAO.saveCube(null);
 
-        verify(this.jdbcTemplate, times(1)).queryForObject(
+        // then
+        assertThat(uuid).as("Null check").isNull();
+
+        verify(jdbcTemplate, never()).queryForObject(
             anyString(),
             eq(UUID.class),
             anyString(),
@@ -125,124 +94,373 @@ public final class CubeDAOTest {
             anyBoolean(),
             anyInt()
         );
-        verify(this.jdbcTemplate, times(1)).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
+
+        verify(jdbcTemplate, never()).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
     }
 
     @Test
-    public void findCubesByType_test() {
+    void whenACubeIsSavedWithoutImageThenShouldProceedCorrectlyAndReturnsUUID() {
         // given
-        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube(), new Cube());
+        Cube cube = CubeHelper.builder().noImage().build();
 
-        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
+        when(jdbcTemplate.queryForObject(
+           anyString(),
+           eq(UUID.class),
+           anyString(),
+           anyDouble(),
+           anyString(),
+           anyString(),
+           anyString(),
+           anyInt(),
+           anyString(),
+           anyBoolean(),
+           anyBoolean(),
+           anyInt()
+        )).thenReturn(UUID.randomUUID());
+
+        when(this.jdbcTemplate.batchUpdate(anyString(),
+            any(BatchPreparedStatementSetter.class))).thenReturn(new int[]{});
+
+        // when
+        UUID uuid = cubeDAO.saveCube(cube);
+
+        // then
+        assertThat(uuid).as("Null check").isNotNull();
+
+        verify(jdbcTemplate, times(1)).queryForObject(
+            anyString(),
+            eq(UUID.class),
+            anyString(),
+            anyDouble(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyString(),
+            anyBoolean(),
+            anyBoolean(),
+            anyInt()
+       );
+
+       verify(jdbcTemplate, never()).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
+    }
+
+    @Test
+    void whenACubeIsSavedWithImageThenShouldProceedCorrectlyAndReturnsUUID()  {
+        Cube cube = CubeHelper.builder().withImage().build();
+
+        when(jdbcTemplate.queryForObject(
+            anyString(),
+            eq(UUID.class),
+            anyString(),
+            anyDouble(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyString(),
+            anyBoolean(),
+            anyBoolean(),
+            anyInt()
+        )).thenReturn(UUID.randomUUID());
+
+        when(this.jdbcTemplate.batchUpdate(anyString(),
+            any(BatchPreparedStatementSetter.class))).thenReturn(new int[]{});
+
+        // when
+        UUID actualUUID = cubeDAO.saveCube(cube);
+
+        //then
+        assertThat(actualUUID).as("Null check").isNotNull();
+
+        verify(jdbcTemplate, times(1)).queryForObject(
+            anyString(),
+            eq(UUID.class),
+            anyString(),
+            anyDouble(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyString(),
+            anyBoolean(),
+            anyBoolean(),
+            anyInt()
+        );
+
+        verify(jdbcTemplate, times(1)).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
+    }
+
+    @Test
+    void whenFindCubesByTypeIsCorrectlyInvokedThenReturnsExpectedList() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
             .thenReturn(expectedList);
 
         // when
-        List<Cube> resultingList = this.cubeDAO.findCubesByType("2x2x2");
+        List<Cube> actualList = this.cubeDAO.findCubesByType("2x2x2").get();
 
         // then
-        assertNotNull(resultingList);
-        assertEquals(3, resultingList.size(), "Size of resulting list");
-        assertEquals(expectedList, resultingList);
+        assertThat(actualList)
+            .as("Empty check").isNotEmpty()
+            .as("Null check").isNotNull()
+            .as("Size of actual list").hasSize(5)
+            .as("Validation of the list").extracting("name", String.class)
+            .containsExactly("Blue cube", "Yellow cube", "Green cube", "Pink cube", "Red cube");
 
-        verify(this.jdbcTemplate, times(1))
+        verify(jdbcTemplate, times(1))
             .query(anyString(), any(RowMapper.class), anyString());
     }
 
     @Test
-    public void findCubesByTypeAndOrder_test() {
-        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube(), new Cube());
+    void whenFindCubesByTypeIsInvokedWithNullTypeThenReturnsEmptyOptional() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
 
-        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
             .thenReturn(expectedList);
 
-        List<Cube> resultingList = this.cubeDAO.findCubesByTypeAndOrder("2x2x2", "alpha_asc");
+        // when
+        Optional<List<Cube>> actualList = this.cubeDAO.findCubesByType(null);
 
-        assertNotNull(resultingList);
-        assertEquals(3, resultingList.size(), "Size of resulting list");
-        assertEquals(expectedList, resultingList);
+        // then
+        assertThat(actualList.isEmpty()).as("Empty check").isTrue();
 
-        verify(this.jdbcTemplate, times(1))
+        verify(jdbcTemplate, never())
             .query(anyString(), any(RowMapper.class), anyString());
     }
 
-//    @Test
-//    public void findCubesByIdList_test() {
-//        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube(), new Cube());
-//
-//        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class)))
-//            .thenReturn(expectedList);
-//
-//        List<Cube> resultingList = this.cubeDAO.findCubesByIdList(new String[]{});
-//
-//        assertNotNull(resultingList);
-//        assertEquals(3, resultingList.size(), "Size of resulting list");
-//        assertEquals(expectedList, resultingList);
-//
-//        verify(this.jdbcTemplate, times(1))
-//            .query(anyString(), any(RowMapper.class));
-//    }
+    @Test
+    void whenFindCubesByTypeIsInvokedWithEmptyTypeThenReturnsEmptyOptional() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
+            .thenReturn(expectedList);
+
+        Optional<List<Cube>> actualList = this.cubeDAO.findCubesByType("");
+
+        // then
+        assertThat(actualList.isEmpty()).as("Empty check").isTrue();
+
+        verify(jdbcTemplate, never())
+            .query(anyString(), any(RowMapper.class), anyString());
+    }
+    
+    @Test
+    void whenFindCubesByIdListIsInvokedCorrectlyThenReturnsExpectedList() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(expectedList);
+        
+        // when
+        List<Cube> actualList = cubeDAO.findCubesByIdList(new UUID[]{UUID.randomUUID()}).get();
+        
+        // then
+        assertThat(actualList)
+            .as("Empty check").isNotEmpty()
+            .as("Null check").isNotNull()
+            .as("Size of actual list").hasSize(5)
+            .as("Validation of the list").extracting("name", String.class)
+            .containsExactly("Blue cube", "Yellow cube", "Green cube", "Pink cube", "Red cube");
+        
+        verify(jdbcTemplate, times(1)).query(anyString(), any(RowMapper.class));
+        verify(jdbcTemplate, only()).query(anyString(), any(RowMapper.class));
+    }
 
     @Test
-    public void findCubeById_test() {
-        Cube expectedCube = new Cube();
+    void whenFindCubesByIdListIsInvokedWithEmptyUUIDListThenReturnsEmptyOptional() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
 
-        when(this.jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), any(UUID.class)))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(expectedList);
+
+        // when
+        Optional<List<Cube>> actualList = cubeDAO.findCubesByIdList(new UUID[]{});
+
+        // then
+        assertThat(actualList.isEmpty()).as("Empty check").isTrue();
+
+        verify(jdbcTemplate, never()).query(anyString(), any(RowMapper.class));
+    }
+
+    @Test
+    void whenFindCubesByIdListIsInvokedWithNullUUIDListThenReturnsEmptyOptional() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(expectedList);
+
+        // when
+        Optional<List<Cube>> actualList = cubeDAO.findCubesByIdList(null);
+
+        // then
+        assertThat(actualList.isEmpty()).as("Empty check").isTrue();
+
+        verify(jdbcTemplate, never()).query(anyString(), any(RowMapper.class));
+    }
+    
+    @Test
+    void whenFindCubeByIdIsInvokedWithValidIdThenReturnsExpectedCube() {
+        // given
+        Cube expectedCube = CubeHelper.builder().name("Blue cube").build();
+
+        when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), isA(UUID.class)))
             .thenReturn(expectedCube);
 
-        Cube resultingCube = this.cubeDAO.findCubeById(UUID.randomUUID());
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), any(UUID.class)))
+            .thenReturn(1);
 
-        assertNotNull(resultingCube);
-        assertEquals(expectedCube, resultingCube);
+        // when
+        Cube actualCube = this.cubeDAO.findCubeById(UUID.randomUUID()).get();
 
-        verify(this.jdbcTemplate, times(1))
+        // then
+        assertThat(actualCube).as("Null check").isNotNull()
+            .as("Validation of the cube").isEqualTo(expectedCube);
+        
+        verify(jdbcTemplate, times(1))
             .queryForObject(anyString(), any(RowMapper.class), any(UUID.class));
+
+        verify(jdbcTemplate, times(1))
+            .queryForObject(anyString(), eq(Integer.class), any(UUID.class));
     }
 
     @Test
-    public void findImageById_test() {
-        byte[] expectedBytes = {};
+    void whenFindCubeByIdIsInvokedWithNullIdThenReturnsEmptyOptional() {
+        // given
+        Cube expectedCube = CubeHelper.builder().name("Blue cube").build();
 
-        when(this.jdbcTemplate.queryForObject(anyString(), eq(byte[].class), any(UUID.class)))
+        when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), isA(UUID.class)))
+            .thenReturn(expectedCube);
+
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), any(UUID.class)))
+            .thenReturn(1);
+
+        // when
+        Optional<Cube> actualCube = this.cubeDAO.findCubeById(null);
+
+        // then
+        assertThat(actualCube.isEmpty()).as("Empty check").isTrue();
+
+        verify(jdbcTemplate, never())
+            .queryForObject(anyString(), any(RowMapper.class), any(UUID.class));
+
+        verify(jdbcTemplate, never())
+            .queryForObject(anyString(), eq(Integer.class), any(UUID.class));
+    }
+
+    @Test
+    void whenFindImageByIdIsInvokedWithValidIdThenReturnsExpectedImage() {
+        // given
+        byte[] expectedBytes = {123, 124, 125, 126, 127};
+
+        when(jdbcTemplate.queryForObject(anyString(), eq(byte[].class), any(UUID.class)))
             .thenReturn(expectedBytes);
 
-        byte[] resultingBytes = this.cubeDAO.findImageById(UUID.randomUUID());
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), any(UUID.class)))
+            .thenReturn(1);
 
-        assertNotNull(resultingBytes);
-        assertArrayEquals(expectedBytes, resultingBytes);
+        // when
+        byte[] actualBytes = this.cubeDAO.findImageById(UUID.randomUUID()).get();
 
-        verify(this.jdbcTemplate, times(1)).queryForObject(anyString(), eq(byte[].class), any(UUID.class));
+        // then
+        assertThat(actualBytes).as("Null check").isNotNull()
+           .as("Empty check").isNotEmpty()
+           .as("Validation of the bytes")
+           .containsExactly(new byte[]{123, 124, 125, 126, 127});
+
+        verify(jdbcTemplate, times(1))
+            .queryForObject(anyString(), eq(byte[].class), isA(UUID.class));
+
+        verify(jdbcTemplate, times(1))
+            .queryForObject(anyString(), eq(Integer.class), any(UUID.class));
     }
 
     @Test
-    public void findNamesByExpression_test() {
-        List<String> expectedList = List.<String>of("name 1", "name 2", "name 3");
+    void whenFindImageByIdIsInvokedWithNullIdThenReturnsEmptyOptional() {
+        // given
+        byte[] expectedBytes = {123, 124, 125, 126, 127};
 
-        when(this.jdbcTemplate.queryForList(anyString(), eq(String.class), anyString()))
-            .thenReturn(expectedList);
+        when(jdbcTemplate.queryForObject(anyString(), eq(byte[].class), any(UUID.class)))
+            .thenReturn(expectedBytes);
 
-        List<String> resultingList = this.cubeDAO.findNamesByExpression("exp");
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), any(UUID.class)))
+            .thenReturn(1);
 
-        assertEquals(3, resultingList.size(), "Size of the resulting list");
-        assertArrayEquals(
-            expectedList.toArray(String[]::new),
-            resultingList.toArray(String[]::new),
-            "Equality of the lists"
-        );
+        // when
+        Optional<byte[]> actualBytes = this.cubeDAO.findImageById(null);
 
-        verify(this.jdbcTemplate, times(1)).queryForList(anyString(), eq(String.class), anyString());
+        // then
+        assertThat(actualBytes.isEmpty()).as("Empty check").isTrue();
+
+        verify(jdbcTemplate, never())
+            .queryForObject(anyString(), eq(byte[].class), isA(UUID.class));
+
+        verify(jdbcTemplate, never())
+            .queryForObject(anyString(), eq(Integer.class), any(UUID.class));
     }
 
     @Test
-    public void findCubesByExpressionAndOrder_test() {
-        List<Cube> expectedList = List.<Cube>of(new Cube(), new Cube());
+    void whenFindCubesByExpressionIsInvokedThenReturnsExpectedNames() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
 
-        when(this.jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
             .thenReturn(expectedList);
 
-        List<Cube> resultingList = this.cubeDAO.findCubesByExpressionAndOrder("exp", "price_desc");
+        // when
+        List<Cube> actualList = this.cubeDAO.findCubesByName("exp").get();
 
-        assertEquals(2, resultingList.size(), "Size of the resulting list");
+        // then
+        assertThat(actualList).as("Size of the actual list").hasSize(5)
+            .as("Null check").isNotNull()
+            .as("Empty check").isNotEmpty()
+            .as("Validation of cubes")
+            .extracting("name", String.class)
+            .containsExactlyInAnyOrderElementsOf(
+                expectedList.stream().map(Cube::getName).collect(Collectors.toList())
+            );
 
-        verify(this.jdbcTemplate, times(1)).query(anyString(), any(RowMapper.class), anyString());
+        verify(jdbcTemplate, times(1))
+            .query(anyString(), any(RowMapper.class), anyString());
+        verify(jdbcTemplate, only())
+            .query(anyString(), any(RowMapper.class), anyString());
+    }
+
+    @Test
+    void whenFindCubesByExpressionIsInvokedWithEmptyExpressionThenReturnsEmptyOptional() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
+            .thenReturn(expectedList);
+
+        // when
+        Optional<List<Cube>> actualList = this.cubeDAO.findCubesByName("");
+
+        // then
+        assertThat(actualList.isEmpty()).as("Empty check").isTrue();
+
+        verify(jdbcTemplate, never()).query(anyString(), any(RowMapper.class), anyString());
+    }
+
+    @Test
+    void whenFindCubesByExpressionIsInvokedWithNullExpressionThenReturnsEmptyOptional() {
+        // given
+        List<Cube> expectedList = CubeHelper.getFiveCubes();
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class), anyString()))
+            .thenReturn(expectedList);
+
+        // when
+        Optional<List<Cube>> actualList = this.cubeDAO.findCubesByName(null);
+
+        // then
+        assertThat(actualList.isEmpty()).as("Empty check").isTrue();
+
+        verify(jdbcTemplate, never()).query(anyString(), any(RowMapper.class), anyString());
     }
 }
