@@ -97,8 +97,8 @@
 
                         <div class="mb-3">
                         	<label for="cube-images" class="form-label">Images:</label>
-                            <input type="file" multiple="multiple" id="cube-images" name="cube-files" class="form-control" th:field="*{imageFile}"/>
-                            <small class="form-text text-danger help-msg" th:if="${#fields.hasErrors('imageFile')}" th:errors="*{imageFile}">We'll never share your data with anyone else.</small>
+                            <input type="file" multiple="multiple" id="cube-images" name="cube-files" class="form-control" th:field="*{imageFiles}"/>
+                            <small class="form-text text-danger help-msg" th:if="${#fields.hasErrors('imageFiles')}" th:errors="*{imageFiles}">We'll never share your data with anyone else.</small>
                             <small class="form-text text-muted d-block">Select at least two images of 1000x600 px with max size of 100KB</small>
                         </div>
 

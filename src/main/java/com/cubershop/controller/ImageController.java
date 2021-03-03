@@ -5,12 +5,9 @@ import com.cubershop.exception.ImageNotFoundException;
 import com.cubershop.exception.NumberOfParametersExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -22,10 +19,15 @@ public class ImageController {
     @GetMapping(path = "static/img/{uuid}", produces = {MediaType.IMAGE_JPEG_VALUE})
     public byte[] getImage(
         @PathVariable(name = "uuid") UUID uuid,
-        @RequestParam List<String> params) throws Exception {
+        @RequestParam Map<String, String> params) throws Exception {
         if(params.size() > 0) throw new NumberOfParametersExceededException();
 
         return this.cubeDAO.findImageById(uuid)
             .orElseThrow(() -> new ImageNotFoundException(uuid));
+    }
+
+    @ExceptionHandler
+    public Exception exceptionHandler(final Exception exception) {
+        return exception;
     }
 }

@@ -1,16 +1,7 @@
 package com.cubershop;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SuppressWarnings("SpellCheckingInspection")
-@SpringBootTest
-@SpringBootConfiguration
+@SpringBootApplication
 public class CubershopApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
 }
