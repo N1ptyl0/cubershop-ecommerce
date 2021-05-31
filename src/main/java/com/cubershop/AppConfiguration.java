@@ -40,19 +40,4 @@ public class AppConfiguration implements WebMvcConfigurer {
 
         return new HikariDataSource(config);
     }
-
-    @Bean
-    @Profile("dev")
-    public HikariDataSource devHikariDataSource() {
-        HikariConfig config = new HikariConfig() {
-            {
-                setDriverClassName("org.postgresql.Driver");
-                setJdbcUrl("jdbc:postgresql://localhost:5432/cubershop?useTimezone=true&serverTimezone=UTC");
-                setUsername("test");
-                setPassword("test");
-            }
-        };
-
-        return new HikariDataSource(config);
-    }
 }
