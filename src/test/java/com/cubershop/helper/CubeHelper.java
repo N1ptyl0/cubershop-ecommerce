@@ -1,16 +1,14 @@
-package com.cubershop.helpers;
+package com.cubershop.helper;
 
-import com.cubershop.entity.Cube;
-import com.cubershop.entity.Installment;
-import com.cubershop.entity.Price;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
+import com.cubershop.entity.*;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
-public final class CubeHelper extends Cube {
+public final class CubeHelper {
 
 	private final Cube cube = new Cube();
 
@@ -23,12 +21,12 @@ public final class CubeHelper extends Cube {
 		return this;
 	}
 
-	public CubeHelper price(Price price) {
+	public CubeHelper price(double price) {
 		this.cube.setPrice(price);
 		return this;
 	}
 
-	public CubeHelper type(String type) {
+	public CubeHelper type(Type type) {
 		this.cube.setType(type);
 		return this;
 	}
@@ -43,7 +41,7 @@ public final class CubeHelper extends Cube {
 		return this;
 	}
 
-	public CubeHelper colorPattern(String colorPattern) {
+	public CubeHelper colorPattern(ColorPattern colorPattern) {
 		this.cube.setColorPattern(colorPattern);
 		return this;
 	}
@@ -69,10 +67,10 @@ public final class CubeHelper extends Cube {
 	}
 
 	public CubeHelper withImages(int quantity) {
-		List<MultipartFile> multipartFiles = new Vector<>();
-		for(int i = 1; i <= quantity; i++)
-			multipartFiles.add(new MockMultipartFile("cube "+i, new byte[]{1, 1, 1, 1}));
-		this.cube.setImageFiles(multipartFiles);
+		IntStream.rangeClosed(1, quantity).boxed()
+			 .map(i -> new Image(UUID.randomUUID(), new byte[]{1, 1, 1, 1}, Calendar.getInstance(), null))
+			 .forEach(this.cube.getImages()::add);
+
 		return this;
 	}
 
@@ -81,15 +79,15 @@ public final class CubeHelper extends Cube {
 	}
 
 	public CubeHelper noImage() {
-		this.cube.setImageFiles(Collections.emptyList());
+		this.cube.setImages(Collections.emptySet());
 		return this;
 	}
 
 	public static List<Cube> getFiveCubes() {
-		return getFiveCubesWithType("big");
+		return getFiveCubesWithType(new Type(Type.Option.BIG));
 	}
 
-	public static List<Cube> getFiveCubesWithType(String type) {
+	public static List<Cube> getFiveCubesWithType(Type type) {
 		return List.of(
 			CubeHelper.builder().withImage().type(type).name("Blue cube").build(),
 			CubeHelper.builder().withImage().type(type).name("Yellow cube").build(),
