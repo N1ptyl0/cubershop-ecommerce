@@ -1,51 +1,26 @@
 package com.cubershop.entity;
 
-public final class Installment implements Comparable<Installment> {
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-    private Price price;
-    private int quote;
+@Getter
+@Setter
+@EqualsAndHashCode
+public final class Installment {
 
-    public Installment(final Price price, final int quote) {
-        price.setValue(price.getValue() / quote);
-        
-        this.price = price;
-        this.quote = quote;
-    }
+    private double totalPrice;
+    private int quantity;
+    private double quote;
 
-    public Price getPrice() {
-        return price;
-    }
-
-    public void setPrice(Price price) {
-        this.price = price;
-    }
-
-    public int getQuote() {
-        return quote;
-    }
-
-    public void setQuote(int quote) {
-        this.quote = quote;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(obj == null || !(obj instanceof Installment))
-            return false;
-        if(this == obj) return true;
-
-        Installment installment = (Installment) obj;
-        return this.price.equals(installment.getPrice()) && this.quote == installment.getQuote();
-    }
-
-    @Override
-    public int compareTo(Installment installment) {
-        return (int) ((this.price.getValue() + this.quote)
-            - (installment.getPrice().getValue() + installment.getQuote()));
+    public Installment(final double totalPrice, final int quantity) {
+        this.totalPrice = totalPrice;
+        this.quantity = quantity;
+        this.quote = totalPrice / quantity;
     }
 
     @Override
     public String toString() {
-        return String.format("Até %dx de %s", this.quote, this.price+"");
+        return String.format("De R$ %s por %dx de %s", this.totalPrice+"", this.quantity, this.quote);
     }
 }
