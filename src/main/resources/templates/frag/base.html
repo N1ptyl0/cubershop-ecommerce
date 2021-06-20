@@ -87,11 +87,11 @@
         </header>
 
         <nav class="nav bg-nu-color nav-justified sticky-top" style="z-index: 2;" th:fragment="nav" th:if="${components.contains('nav') || components.contains('all')}">
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('2x2x2')}" href="/category.html">2x2x2</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('3x3x3')}" href="/category.html">3x3x3</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('4x4x4')}" href="/category.html">4x4x4</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('5x5x5')}" href="/category.html">5x5x5</a>
-            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.category('big')}" href="/category.html">Big Cubes</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.catalog('2x2x2')}" href="/catalog.html">2x2x2</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.catalog('3x3x3')}" href="/catalog.html">3x3x3</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.catalog('4x4x4')}" href="/catalog.html">4x4x4</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.catalog('5x5x5')}" href="/catalog.html">5x5x5</a>
+            <a class="nav-link text-decoration-none text-monospace font-weight-bold nav-button" th:href="#{route.page.catalog('big')}" href="/catalog.html">Big Cubes</a>
         </nav>
 
         <div class="jumbotron p-3 text-center m-0 border border-secondary border-left-0 border-right-0 rounded-0" th:fragment="plus" th:if="${components.contains('plus') || components.contains('all')}">
