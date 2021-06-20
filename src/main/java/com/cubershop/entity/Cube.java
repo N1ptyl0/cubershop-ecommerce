@@ -1,36 +1,77 @@
 package com.cubershop.entity;
 
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.*;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
-import java.util.Collections;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
+@Entity
+@Builder
+@NoArgsConstructor
+@Table(name = "tb_cube")
+@AllArgsConstructor
 public class Cube {
 
-    private int size;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
     private UUID id;
-    private Price price;
-    private String name, type, description, brand, colorPattern;
-    private UUID[] imageUUID;
-    private List<MultipartFile> imageFiles;
-    private Installment installment;
-    private int quantity;
-    private boolean stock, magnetic;
 
-    public Cube() {
-        this.id = UUID.randomUUID();
-        this.size = 50;
-        this.price = new Price();
-        this.name = this.type = this.description = this.brand = this.colorPattern = "";
-        this.imageUUID = new UUID[]{UUID.randomUUID(), UUID.randomUUID()};
-        //noinspection unchecked
-        this.imageFiles = Collections.EMPTY_LIST;
-        this.installment = new Installment(this.price, 3);
-    }
+    @Column(name = "name", nullable = false, length = 100, unique = true)
+    private String name;
+
+    @Column(name = "price", nullable = false, precision = 2)
+    private double price;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(
+        name = "type_id",
+        referencedColumnName = "id",
+        foreignKey = @ForeignKey(name = "fk_type_cube"), nullable = false
+    )
+    private Type type;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(
+        name = "color_pattern_id",
+        referencedColumnName = "id",
+        foreignKey = @ForeignKey(name = "fk_colorPattern_cube"), nullable = false
+    )
+    private ColorPattern colorPattern;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "brand", nullable = false, length = 32)
+    private String brand;
+
+    @Column(name = "create_date", nullable = false, columnDefinition = "TIMESTAMPTZ")
+    private Calendar createDate;
+
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMPTZ")
+    private Calendar lastUpdate;
+
+    @Column(name = "size", nullable = false, columnDefinition = "SMALLINT")
+    private int size;
+
+    @OneToMany(mappedBy = "cube", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private List<Image> images;
+
+    @Transient
+    private Installment installment;
+
+    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT")
+    private int quantity;
+
+    @Column(name = "magnetic", nullable = false)
+    private boolean magnetic;
+
+    @Column(name = "stock", nullable = false)
+    private boolean stock;
 }
