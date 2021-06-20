@@ -1,12 +1,12 @@
 package com.cubershop.controller;
 
-import com.cubershop.database.template.CubeDAOTemplate;
 import com.cubershop.entity.Cube;
+import com.cubershop.entity.Type;
 import com.cubershop.exception.CubeNotFoundException;
-import com.cubershop.exception.HomeCubesNotFoundException;
-import com.cubershop.exception.ListOfCubesNotFoundException;
-import com.cubershop.exception.NumberOfParametersExceededException;
-import com.cubershop.utils.CubeOrderProcessor;
+import com.cubershop.exception.HttpException;
+import com.cubershop.service.CubeService;
+import com.cubershop.service.TypeService;
+import com.cubershop.utils.CubeSort;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
@@ -26,25 +26,23 @@ import static java.util.stream.Collectors.toSet;
 @Controller
 public final class PageController {
 
-    private final CubeDAOTemplate cubeDAOTemplate;
+    private final CubeService cubeService;
+    private final TypeService typeService;
 
     @Autowired
-    public PageController(CubeDAOTemplate cubeDAOTemplate) {
-        this.cubeDAOTemplate = cubeDAOTemplate;
+    public PageController(CubeService cubeService, TypeService typeService) {
+        this.cubeService = cubeService;
+        this.typeService = typeService;
     }
 
-    @GetMapping(path = {"/", "/home", "/index"})
+    @GetMapping(path = {"/", "/home", "/index"}, produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public String homePage(
-        Model model, HttpServletResponse response, HttpServletRequest request) throws Exception {
-        if(request.getParameterMap().size() > 0)
-            throw new NumberOfParametersExceededException();
-
+    public String homePage(Model model, HttpServletResponse response) throws Exception {
         response.addHeader("Content-Type", MediaType.TEXT_HTML_VALUE);
+        List<Cube> cubes = (List<Cube>) this.cubeService.findAll();
 
-        List<Cube> cubes = this.cubeDAOTemplate
-            .findHomeCubes()
-            .orElseThrow(HomeCubesNotFoundException::new);
+        if (!cubes.isEmpty())
+            throw new CubeNotFoundException("There are not cubes to retrieve");
 
         model.addAttribute("cubes", cubes.stream().collect(groupingBy(Cube::getType, toSet())));
         model.addAttribute("components", List.of("all"));
@@ -52,33 +50,35 @@ public final class PageController {
         return "home";
     }
 
-    @GetMapping(path = "/category/{category:2x2x2|3x3x3|4x4x4|5x5x5|others|big}")
+    @GetMapping(path = "/catalog/{type:2x2x2|3x3x3|4x4x4|5x5x5|others|big}", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public String categoryPage(@PathVariable String category,
-    @RequestParam(name = "order", defaultValue = "alpha_asc") String order, Model model,
-    HttpServletResponse response) throws Exception {
+    public String catalogPage(
+        @PathVariable String type,
+        @RequestParam(name = "order", defaultValue = "alpha_asc") String order, Model model,
+        HttpServletResponse response
+    ) throws Exception {
         response.addHeader("Content-Type", MediaType.TEXT_HTML_VALUE);
 
-        List<Cube> cubes = this.cubeDAOTemplate.findCubesByType(category)
-            .orElseThrow(() -> new ListOfCubesNotFoundException(category, order));
+        List<Cube> cubes = this.typeService.findByName(Type.Name.valueOf(type)).orElseThrow().getCubes();
 
-        cubes = CubeOrderProcessor.process(cubes, order);
+        cubes = cubes.stream().sorted(CubeSort.getComparator(order)).collect(Collectors.toList());
 
         model.addAttribute("isSearchPage", false);
         model.addAttribute("selectedOrder", order);
-        model.addAttribute("category", category);
+        model.addAttribute("type", type);
         model.addAttribute("cubeList", Lists.partition(cubes, 3));
         model.addAttribute("components", List.of("all"));
 
-        return "category";
+        return "catalog";
     }
 
     @GetMapping(value = "/description/{id}")
     @ResponseStatus(HttpStatus.OK)
     public String descriptionPage(
-    @PathVariable("id") UUID id, Model model, HttpServletResponse response) throws CubeNotFoundException {
-        Cube cube = this.cubeDAOTemplate.findCubeById(id)
-            .orElseThrow(() -> new CubeNotFoundException(id));
+        @PathVariable("id") UUID id, Model model, HttpServletResponse response
+    ) throws CubeNotFoundException {
+        Cube cube = this.cubeService.findById(id)
+            .orElseThrow(() -> new CubeNotFoundException("Cube with id "+id+" not found!"));
 
         response.addHeader("Content-Type", MediaType.TEXT_HTML_VALUE);
         model.addAttribute("cube", cube);
@@ -87,15 +87,20 @@ public final class PageController {
         return "description";
     }
 
-    @GetMapping(value = "/search", params = "exp")
+    @GetMapping(value = "/search", params = "exp", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public String searchPage(
-    @RequestParam(name = "exp") String expression,
-    @RequestParam(name = "order", defaultValue = "alpha_asc") String order, Model model) throws Exception {
-        List<Cube> cubes = this.cubeDAOTemplate.findCubesByName(expression)
-            .orElseThrow(ListOfCubesNotFoundException::new);
+        @RequestParam(name = "exp") String expression,
+        @RequestParam(name = "order", defaultValue = "alpha_asc") String order,
+        Model model, HttpServletResponse response
+    ) throws Exception {
+        List<Cube> cubes = this.cubeService.findAllByName(expression);
 
-        cubes = CubeOrderProcessor.process(cubes, order);
+        if (cubes.isEmpty()) throw new CubeNotFoundException("No cube matches to expression: "+expression);
+
+        response.setContentType(MediaType.TEXT_HTML_VALUE);
+
+        cubes = cubes.stream().sorted(CubeSort.getComparator(order)).collect(Collectors.toList());
 
         model.addAttribute("isSearchPage", true);
         model.addAttribute("selectedOrder", order);
@@ -104,13 +109,13 @@ public final class PageController {
 //        model.addAttribute("components", List.<String>of("all"));
         model.addAttribute("components", List.of("header", "nav", "news", "footer"));
 
-        return "category";
+        return "catalog";
     }
 
     @ExceptionHandler
-    public String exceptionsResolver(Model model, Exception exception, HttpServletResponse response) {
-        int statusCode = HttpStatus.BAD_REQUEST.value();
-        String statusName = HttpStatus.BAD_REQUEST.name();
+    public String exceptionsResolver(Model model, HttpException exception, HttpServletResponse response) {
+        int statusCode = exception.getStatusCode().value();
+        String statusName = exception.getStatusName();
         String message = exception.getMessage();
 
         response.setStatus(statusCode);
