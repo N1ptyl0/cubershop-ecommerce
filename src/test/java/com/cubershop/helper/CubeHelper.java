@@ -1,118 +1,117 @@
 package com.cubershop.helper;
 
-import com.cubershop.entity.*;
+import com.cubershop.entity.ColorPattern;
+import com.cubershop.entity.Cube;
+import com.cubershop.entity.Image;
+import com.cubershop.entity.Type;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
+import java.util.Vector;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public final class CubeHelper {
-
-	private final Cube cube = new Cube();
 
 	public static CubeHelper builder() {
 		return new CubeHelper();
 	}
 
-	public CubeHelper name(String name) {
-		this.cube.setName(name);
+	private List<Cube> cubes = new Vector<>();
+
+	private String generateRandomName(final int size) {
+		final char[] chars = {
+			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+			'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+		};
+
+		return new Random().ints(size, 0, chars.length).boxed()
+			.map(i -> (chars[i]+""))
+			.collect(Collectors.joining(""));
+	}
+
+	public CubeHelper withType(Type type) {
+		this.cubes.forEach(cube -> cube.setType(type));
 		return this;
 	}
 
-	public CubeHelper price(double price) {
-		this.cube.setPrice(price);
+	public CubeHelper withColorPattern(ColorPattern colorPattern) {
+		this.cubes.forEach(cube -> cube.setColorPattern(colorPattern));
 		return this;
 	}
 
-	public CubeHelper type(Type type) {
-		this.cube.setType(type);
-		return this;
-	}
+	public CubeHelper withCubes(final int quantity) {
+		ColorPattern colorPattern = ColorPattern.builder()
+			.id(null)
+			.name("Traditional")
+			.cubes(new Vector<>())
+			.createDate(Calendar.getInstance()).build();
 
-	public CubeHelper description(String description) {
-		this.cube.setDescription(description);
-		return this;
-	}
+		Type type = Type.builder()
+			.name(Type.Name._3x3x3)
+			.cubes(new Vector<>())
+			.id(null)
+			.createDate(Calendar.getInstance()).build();
 
-	public CubeHelper brand(String brand) {
-		this.cube.setBrand(brand);
-		return this;
-	}
-
-	public CubeHelper colorPattern(ColorPattern colorPattern) {
-		this.cube.setColorPattern(colorPattern);
-		return this;
-	}
-
-	public CubeHelper installment(Installment installment) {
-		this.cube.setInstallment(installment);
-		return this;
-	}
-
-	public CubeHelper quantity(int quantity) {
-		this.cube.setQuantity(quantity);
-		return this;
-	}
-
-	public CubeHelper stock(boolean stock) {
-		this.cube.setStock(stock);
-		return this;
-	}
-
-	public CubeHelper magnetic(boolean magnetic) {
-		this.cube.setStock(magnetic);
-		return this;
-	}
-
-	public CubeHelper withImages(int quantity) {
-		IntStream.rangeClosed(1, quantity).boxed()
-			 .map(i -> new Image(UUID.randomUUID(), new byte[]{1, 1, 1, 1}, Calendar.getInstance(), null))
-			 .forEach(this.cube.getImages()::add);
+		IntStream.range(0, quantity).boxed()
+			.map(i -> {
+				return Cube.builder()
+					.brand("IG")
+					.colorPattern(colorPattern)
+					.name(generateRandomName(8))
+					.lastUpdate(Calendar.getInstance())
+					.price(90.10)
+					.size(60)
+					.type(type)
+					.description(null)
+					.id(null)
+					.installment(null)
+					.createDate(Calendar.getInstance())
+					.images(null).build();
+			})
+			.forEach(cube -> {
+				colorPattern.addCube(cube);
+				type.addCube(cube);
+				this.cubes.add(cube);
+			});
 
 		return this;
 	}
 
-	public CubeHelper withImage() {
-		return this.withImages(1);
-	}
+	public CubeHelper withImages(final int quantity) {
+		cubes.forEach(cube -> {
+			cube.setImages(
+				IntStream.range(0, quantity).boxed()
+					.map(i -> Image.builder()
+						.id(null)
+						.createDate(Calendar.getInstance())
+						.body(generateRandomName(5).getBytes()).build()
+					)
+					.peek(image -> image.setCube(cube))
+					.collect(Collectors.toUnmodifiableList())
+			);
+		});
 
-	public CubeHelper noImage() {
-		this.cube.setImages(Collections.emptySet());
 		return this;
 	}
 
-	public static List<Cube> getFiveCubes() {
-		return getFiveCubesWithType(new Type(Type.Option.BIG));
+	public List<Cube> get() {
+		return this.cubes;
 	}
 
-	public static List<Cube> getFiveCubesWithType(Type type) {
-		return List.of(
-			CubeHelper.builder().withImage().type(type).name("Blue cube").build(),
-			CubeHelper.builder().withImage().type(type).name("Yellow cube").build(),
-			CubeHelper.builder().withImage().type(type).name("Green cube").build(),
-			CubeHelper.builder().withImage().type(type).name("Pink cube").build(),
-			CubeHelper.builder().withImage().type(type).name("Red cube").build()
-		);
+	public static Cube getOneCube(final int imageCount) {
+		return builder().withCubes(1).withImages(imageCount).get().get(0);
 	}
 
-	public static List<Cube> getTenCubes() {
-		return List.of(
-			CubeHelper.builder().name("Blue cube").build(),
-			CubeHelper.builder().name("Yellow cube").build(),
-			CubeHelper.builder().name("Green cube").build(),
-			CubeHelper.builder().name("Pink cube").build(),
-			CubeHelper.builder().name("Brown cube").build(),
-			CubeHelper.builder().name("Purple cube").build(),
-			CubeHelper.builder().name("Black cube").build(),
-			CubeHelper.builder().name("White cube").build(),
-			CubeHelper.builder().name("Red cube").build(),
-			CubeHelper.builder().name("Orange cube").build()
-		);
+	public static Cube getOneCube(final int imageCount, final Type type) {
+		return builder().withCubes(1).withImages(imageCount).withType(type).get().get(0);
 	}
 
-	public Cube build() {
-		return this.cube;
+	public static Cube getOneCube(final int imageCount, final Type type, final ColorPattern colorPattern) {
+		return builder().withCubes(1)
+			.withImages(imageCount)
+			.withType(type)
+			.withColorPattern(colorPattern).get().get(0);
 	}
 }
