@@ -1,15 +1,11 @@
 package com.cubershop.validation;
 
 import com.cubershop.entity.Cube;
-import com.cubershop.entity.Price;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -119,99 +115,99 @@ public final class CubeValidationTest {
             .isEqualTo("Name can not contain special characters");
     }
 
-    @Test
-    void mustValidatePriceFieldNull() {
-        // given
-        cube.setPrice(null);
+//    @Test
+//    void mustValidatePriceFieldNull() {
+//        // given
+//        cube.setPrice(null);
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("price")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("price")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("price").get(0).getCode())
+//            .as("Validation of error code").isEqualTo("cube.price.empty");
+//        assertThat(errors.getFieldErrors("price").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("Price can not be empty");
+//    }
 
-        // when
-        cubeValidation.validate(cube, errors);
+//    @Test
+//    void mustValidatePriceFieldZero() {
+//        // given
+//        Price price = new Price();
+//        price.setValue(0d);
+//        cube.setPrice(price);
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("price")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("price")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("price").get(0).getCode())
+//            .as("Validation of error code").isEqualTo("cube.price.zero");
+//        assertThat(errors.getFieldErrors("price").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("Price can not be zero");
+//    }
 
-        // then
-        assertThat(errors.hasFieldErrors("price")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("price")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("price").get(0).getCode())
-            .as("Validation of error code").isEqualTo("cube.price.empty");
-        assertThat(errors.getFieldErrors("price").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("Price can not be empty");
-    }
+//    @Test
+//    void mustValidatePriceFieldNegative() {
+//        // given
+//        Price price = new Price();
+//        price.setValue(-10d);
+//        cube.setPrice(price);
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("price")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("price")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("price").get(0).getCode())
+//            .as("Validation of error code").isEqualTo("cube.price.negative");
+//        assertThat(errors.getFieldErrors("price").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("Price can not be a negative number");
+//    }
 
-    @Test
-    void mustValidatePriceFieldZero() {
-        // given
-        Price price = new Price();
-        price.setValue(0d);
-        cube.setPrice(price);
+//    @Test
+//    void mustValidateTypeFieldNullOrEmpty() {
+//        // given
+//        cube.setType(null);
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("type")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("type")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("type").get(0).getCode())
+//            .as("Validation of error code").isEqualTo("cube.type.empty");
+//        assertThat(errors.getFieldErrors("type").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("Type can not be empty");
+//    }
 
-        // when
-        cubeValidation.validate(cube, errors);
-
-        // then
-        assertThat(errors.hasFieldErrors("price")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("price")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("price").get(0).getCode())
-            .as("Validation of error code").isEqualTo("cube.price.zero");
-        assertThat(errors.getFieldErrors("price").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("Price can not be zero");
-    }
-
-    @Test
-    void mustValidatePriceFieldNegative() {
-        // given
-        Price price = new Price();
-        price.setValue(-10d);
-        cube.setPrice(price);
-
-        // when
-        cubeValidation.validate(cube, errors);
-
-        // then
-        assertThat(errors.hasFieldErrors("price")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("price")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("price").get(0).getCode())
-            .as("Validation of error code").isEqualTo("cube.price.negative");
-        assertThat(errors.getFieldErrors("price").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("Price can not be a negative number");
-    }
-
-    @Test
-    void mustValidateTypeFieldNullOrEmpty() {
-        // given
-        cube.setType(null);
-
-        // when
-        cubeValidation.validate(cube, errors);
-
-        // then
-        assertThat(errors.hasFieldErrors("type")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("type")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("type").get(0).getCode())
-            .as("Validation of error code").isEqualTo("cube.type.empty");
-        assertThat(errors.getFieldErrors("type").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("Type can not be empty");
-    }
-
-    @Test
-    void mustValidateTypeFieldNotExist() {
-        // given
-        cube.setType("8x8x8");
-
-        // when
-        cubeValidation.validate(cube, errors);
-
-        // then
-        assertThat(errors.hasFieldErrors("type")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("type")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("type").get(0).getCode())
-            .as("Validation of error code").isEqualTo("cube.type.not.exist");
-        assertThat(errors.getFieldErrors("type").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("Type not acceptable");
-    }
+//    @Test
+//    void mustValidateTypeFieldNotExist() {
+//        // given
+//        cube.setType("8x8x8");
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("type")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("type")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("type").get(0).getCode())
+//            .as("Validation of error code").isEqualTo("cube.type.not.exist");
+//        assertThat(errors.getFieldErrors("type").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("Type not acceptable");
+//    }
 
     @Test
     void mustValidateDescriptionFieldNullOrEmpty() {
@@ -376,83 +372,83 @@ public final class CubeValidationTest {
             .isEqualTo("Color pattern can not be empty");
     }
 
-    @Test
-    void mustValidateColorPatternTooShort() {
-        // given
-        cube.setColorPattern("ant");
+//    @Test
+//    void mustValidateColorPatternTooShort() {
+//        // given
+//        cube.setColorPattern("ant");
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("colorPattern")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("colorPattern")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("colorPattern").get(0).getCode())
+//            .as("Validation of error code").isEqualTo("cube.colorPattern.too.small");
+//        assertThat(errors.getFieldErrors("colorPattern").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("ColorPattern can not be too small");
+//    }
 
-        // when
-        cubeValidation.validate(cube, errors);
+//    @Test
+//    void mustValidateColorPatternTooLong() {
+//        // given
+//        cube.setColorPattern("ant".repeat(25));
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("colorPattern")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("colorPattern")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("colorPattern").get(0).getCode())
+//            .as("Validation of error code").isEqualTo("cube.colorPattern.too.long");
+//        assertThat(errors.getFieldErrors("colorPattern").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("ColorPattern can not be too long");
+//    }
 
-        // then
-        assertThat(errors.hasFieldErrors("colorPattern")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("colorPattern")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("colorPattern").get(0).getCode())
-            .as("Validation of error code").isEqualTo("cube.colorPattern.too.small");
-        assertThat(errors.getFieldErrors("colorPattern").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("ColorPattern can not be too small");
-    }
+//    @Test
+//    void mustValidateImageFileSizeVeryLarge() {
+//        //given
+//        byte[] bytes = new byte[((int) 1e5) + 1];
+//        cube.setImageFiles(List.of(
+//            new MockMultipartFile("archive", bytes),
+//            new MockMultipartFile("archive", new byte[]{})
+//        ));
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("imageFiles")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("imageFiles")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("imageFiles").get(0).getCode())
+//            .as("Validation of error code")
+//            .isEqualTo("cube.imageFiles.size.exceeded");
+//        assertThat(errors.getFieldErrors("imageFiles").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("Some file exceeded the file size acceptable");
+//    }
 
-    @Test
-    void mustValidateColorPatternTooLong() {
-        // given
-        cube.setColorPattern("ant".repeat(25));
-
-        // when
-        cubeValidation.validate(cube, errors);
-
-        // then
-        assertThat(errors.hasFieldErrors("colorPattern")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("colorPattern")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("colorPattern").get(0).getCode())
-            .as("Validation of error code").isEqualTo("cube.colorPattern.too.long");
-        assertThat(errors.getFieldErrors("colorPattern").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("ColorPattern can not be too long");
-    }
-
-    @Test
-    void mustValidateImageFileSizeVeryLarge() {
-        //given
-        byte[] bytes = new byte[((int) 1e5) + 1];
-        cube.setImageFiles(List.of(
-            new MockMultipartFile("archive", bytes),
-            new MockMultipartFile("archive", new byte[]{})
-        ));
-
-        // when
-        cubeValidation.validate(cube, errors);
-
-        // then
-        assertThat(errors.hasFieldErrors("imageFiles")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("imageFiles")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("imageFiles").get(0).getCode())
-            .as("Validation of error code")
-            .isEqualTo("cube.imageFiles.size.exceeded");
-        assertThat(errors.getFieldErrors("imageFiles").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("Some file exceeded the file size acceptable");
-    }
-
-    @Test
-    public void mustValidateListOfImageFileVeryShort() {
-        //given
-        cube.setImageFiles(
-            List.of(new MockMultipartFile("archive", new byte[]{}))
-        );
-
-        // when
-        cubeValidation.validate(cube, errors);
-
-        // then
-        assertThat(errors.hasFieldErrors("imageFiles")).as("Presence of error").isTrue();
-        assertThat(errors.getFieldErrorCount("imageFiles")).as("Quantity of error").isEqualTo(1);
-        assertThat(errors.getFieldErrors("imageFiles").get(0).getCode())
-            .as("Validation of error code")
-            .isEqualTo("cube.imageFiles.image.min.select");
-        assertThat(errors.getFieldErrors("imageFiles").get(0).getDefaultMessage())
-            .as("Validation of error default message")
-            .isEqualTo("Select at least two images");
-    }
+//    @Test
+//    public void mustValidateListOfImageFileVeryShort() {
+//        //given
+//        cube.setImageFiles(
+//            List.of(new MockMultipartFile("archive", new byte[]{}))
+//        );
+//
+//        // when
+//        cubeValidation.validate(cube, errors);
+//
+//        // then
+//        assertThat(errors.hasFieldErrors("imageFiles")).as("Presence of error").isTrue();
+//        assertThat(errors.getFieldErrorCount("imageFiles")).as("Quantity of error").isEqualTo(1);
+//        assertThat(errors.getFieldErrors("imageFiles").get(0).getCode())
+//            .as("Validation of error code")
+//            .isEqualTo("cube.imageFiles.image.min.select");
+//        assertThat(errors.getFieldErrors("imageFiles").get(0).getDefaultMessage())
+//            .as("Validation of error default message")
+//            .isEqualTo("Select at least two images");
+//    }
 }
