@@ -1,10 +1,10 @@
 package com.cubershop.controller;
 
 import com.cubershop.entity.Cube;
-import com.cubershop.database.template.CubeDAOTemplate;
 import com.cubershop.exception.CubeNotFoundException;
 import com.cubershop.exception.EmptyParameterValueException;
 import com.cubershop.exception.NumberOfParametersExceededException;
+import com.cubershop.service.CubeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,9 +20,13 @@ import java.util.stream.Collectors;
 
 @Controller
 public class CubeController {
+    
+    private final CubeService cubeService;
 
     @Autowired
-    private CubeDAOTemplate cubeDAO;
+    public CubeController(CubeService cubeService) {
+        this.cubeService = cubeService;
+    }
 
     @GetMapping(path = "/form/cube", produces = MediaType.TEXT_HTML_VALUE)
     public String cubeFormPage(@ModelAttribute Cube cube, BindingResult bindingResult, Model model) {
@@ -41,7 +45,7 @@ public class CubeController {
             return "cube-form";
         }
 
-        model.addAttribute("uuid", this.cubeDAO.saveCube(cube));
+        model.addAttribute("uuid", this.cubeService.save(cube));
 
         return "success";
     }
@@ -56,11 +60,14 @@ public class CubeController {
     public List<String> searchNames(
         @RequestParam(name = "exp", defaultValue = "") String expression,
         @RequestParam Map<String, String> params) throws Exception {
-        if(expression.isEmpty()) throw new EmptyParameterValueException("exp");
-        if(params.size() > 1) throw new NumberOfParametersExceededException();
+        if (expression.isEmpty()) throw new EmptyParameterValueException("exp");
+        if (params.size() > 1) throw new NumberOfParametersExceededException();
 
-        return this.cubeDAO.findCubesByName(expression)
-            .orElseThrow(() -> new CubeNotFoundException(expression))
+        List<Cube> foundCubes = this.cubeService.findAllByName(expression);
+
+        if (foundCubes.isEmpty()) throw new CubeNotFoundException(expression);
+
+        return this.cubeService.findAllByName(expression)
             .stream().map(Cube::getName).collect(Collectors.toList());
     }
 }
