@@ -1,11 +1,11 @@
 package com.cubershop.controller;
 
 import com.cubershop.VoidAppConfiguration;
-import com.cubershop.database.template.CubeDAOTemplate;
 import com.cubershop.entity.Cube;
 import com.cubershop.exception.CubeNotFoundException;
-import com.cubershop.exception.OrderNotAcceptableException;
-import com.cubershop.helpers.CubeHelper;
+import com.cubershop.helper.CubeHelper;
+import com.cubershop.service.CubeService;
+import com.cubershop.service.TypeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
@@ -29,23 +29,25 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 public class PageControllerIntegrationTest {
 
 	private MockMvc mockMvc;
-	private CubeDAOTemplate cubeDAOTemplate;
-	private final List<Cube> fiveCubes = CubeHelper.getFiveCubes();
+	private CubeService cubeService;
+	private TypeService typeService;
+	private final List<Cube> fiveCubes = CubeHelper.builder().withCubes(5).withImages(2).get();
 
 	@BeforeEach
 	void setup() {
-		// Initialize mocking for CubeDAOTemplate
-		this.cubeDAOTemplate = mock(CubeDAOTemplate.class);
-		this.mockMvc = standaloneSetup(new PageController(cubeDAOTemplate)).build();
+		this.cubeService = mock(CubeService.class);
+		this.typeService = mock(TypeService.class);
+		this.mockMvc = standaloneSetup(new PageController(this.cubeService, this.typeService)).build();
 	}
 
 	@Test
-	void whenGETHomePageWithValidPathThenResponsesOK() throws Exception {
+	void givenValidPath_whenGETHomePage_thenResponseOK() throws Exception {
 		// given
-		given(cubeDAOTemplate.findHomeCubes()).willReturn(Optional.ofNullable(fiveCubes));
+		final String validPath = "/";
+		given(cubeService.findAll()).willReturn(fiveCubes);
 
 		// when
-		mockMvc.perform(get("/").accept(MediaType.ALL))
+		mockMvc.perform(get(validPath).accept(MediaType.ALL))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.TEXT_HTML_VALUE))
 			.andExpect(model().size(2))
@@ -53,90 +55,18 @@ public class PageControllerIntegrationTest {
 
 		// then
 		// verify
-		verify(cubeDAOTemplate, times(1)).findHomeCubes();
-		verify(cubeDAOTemplate, only()).findHomeCubes();
+		verify(cubeService, times(1)).findAll();
+		verify(cubeService, only()).findAll();
 	}
 
 	@Test
-	void whenGETHomePageButNoCubeIsFoundThenResponsesNOT_FOUND() throws Exception {
+	void givenExistingId_whenGETDescriptionPage_thenResponsesOk() throws Exception {
 		// given
-		given(cubeDAOTemplate.findHomeCubes()).willReturn(Optional.ofNullable(null));
+		final UUID existentId = UUID.randomUUID();
+		given(this.cubeService.findById(eq(existentId))).willReturn(Optional.ofNullable(CubeHelper.getOneCube(2)));
 
 		// when
-		final MvcResult result = mockMvc.perform(get("/").accept(MediaType.ALL))
-			.andExpect(status().isNotFound())
-			.andExpect(handler().methodName("homePage"))
-			.andReturn();
-
-		// then
-		assertThat(result.getResolvedException()).isNotNull();
-		assertThat(result.getResolvedException()).isInstanceOf(CubeNotFoundException.class);
-
-		// verify
-		verify(cubeDAOTemplate, times(1)).findHomeCubes();
-		verify(cubeDAOTemplate, only()).findHomeCubes();
-	}
-
-	@Test
-	void whenGETCatalogPageWithNotAcceptableOrderParamThenResponsesBAD_REQUEST() throws Exception {
-		// given
-		final String givenType = "3x3x3";
-		final String notAcceptableParamUnderTest = "beta_asc";
-
-		given(cubeDAOTemplate.findCubesByType(eq(givenType)))
-			.willReturn(Optional.ofNullable(fiveCubes));
-
-		// when
-		final MvcResult result = mockMvc.perform(get("/catalog/"+givenType)
-			.param("order", notAcceptableParamUnderTest).accept(MediaType.ALL))
-			.andExpect(status().isBadRequest()).andReturn();
-
-		// then
-		assertThat(result.getResolvedException()).isNotNull();
-		assertThat(result.getResolvedException()).isInstanceOf(OrderNotAcceptableException.class);
-
-		// verify
-		verify(cubeDAOTemplate, times(1)).findCubesByType(eq(givenType));
-		verify(cubeDAOTemplate, only()).findCubesByType(eq(givenType));
-	}
-
-	@Test
-	void whenGETCatalogPageWithOKOrderParamThenResponsesOK() throws Exception {
-		// given
-		final String givenType = "3x3x3";
-		final String OKParamUnderTest = "price_asc";
-
-		given(cubeDAOTemplate.findCubesByType(eq(givenType)))
-			.willReturn(Optional.ofNullable(fiveCubes));
-
-		// when
-		mockMvc.perform(
-			get("/catalog/"+givenType)
-			.param("order", OKParamUnderTest).accept(MediaType.ALL)
-		)
-		.andExpect(status().isOk())
-		.andExpect(model().size(5))
-		.andExpect(handler().methodName("catalogPage"))
-		.andExpect(view().name("catalog"));
-
-
-		// then
-		// verify
-		verify(cubeDAOTemplate, times(1)).findCubesByType(eq(givenType));
-		verify(cubeDAOTemplate, only()).findCubesByType(eq(givenType));
-	}
-
-	@Test
-	void whenGETDescriptionPageWithExistingIDThenResponsesOk() throws Exception {
-		// given
-		final UUID existentIDUnderTest = UUID.randomUUID();
-		final Cube givenCube = CubeHelper.builder().build();
-
-		given(cubeDAOTemplate.findCubeById(eq(existentIDUnderTest)))
-			.willReturn(Optional.ofNullable(givenCube));
-
-		// when
-		mockMvc.perform(get("/description/"+existentIDUnderTest)
+		mockMvc.perform(get("/description/"+existentId)
 			.accept(MediaType.ALL))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.TEXT_HTML))
@@ -145,19 +75,19 @@ public class PageControllerIntegrationTest {
 
 		// then
 		// verify
-		verify(cubeDAOTemplate, times(1)).findCubeById(eq(existentIDUnderTest));
-		verify(cubeDAOTemplate, only()).findCubeById(eq(existentIDUnderTest));
+		verify(cubeService, times(1)).findById(eq(existentId));
+		verify(cubeService, only()).findById(eq(existentId));
 	}
 
 	@Test
-	void whenGETDescriptionPageWithNonExistingIDThenResponsesNOT_FOUND() throws Exception {
+	void givenNonExistingId_whenGETDescriptionPage_thenResponsesNOT_FOUND() throws Exception {
 		// given
-		final UUID nonExistentIDUnderTest = UUID.randomUUID();
+		final UUID nonExistentId = UUID.randomUUID();
 
-		given(cubeDAOTemplate.findCubeById(eq(nonExistentIDUnderTest)))
-				.willReturn(Optional.ofNullable(null));
+		given(cubeService .findById(eq(nonExistentId))).willReturn(Optional.ofNullable(null));
+
 		// when
-		MvcResult result = mockMvc.perform(get("/description/"+nonExistentIDUnderTest)
+		MvcResult result = mockMvc.perform(get("/description/"+nonExistentId)
 			.accept(MediaType.ALL))
 			.andExpect(status().isNotFound())
 			.andExpect(handler().methodName("descriptionPage")).andReturn();
@@ -167,21 +97,21 @@ public class PageControllerIntegrationTest {
 		assertThat(result.getResolvedException()).isInstanceOf(CubeNotFoundException.class);
 
 		// verify
-		verify(cubeDAOTemplate, times(1)).findCubeById(eq(nonExistentIDUnderTest));
-		verify(cubeDAOTemplate, only()).findCubeById(eq(nonExistentIDUnderTest));
+		verify(cubeService, times(1)).findById(eq(nonExistentId));
+		verify(cubeService, only()).findById(eq(nonExistentId));
 	}
 
 	@Test
-	void whenGETSearchPageWithMatchingExpressionThenResponseOK() throws Exception {
+	void givenMatchingExpression_whenGETSearchPage_thenResponseOK() throws Exception {
 		// given
-		final String matchingExpressionUnderTest = "abc";
+		final String matchingExpression = "abc";
 
-		given(this.cubeDAOTemplate.findCubesByName(eq(matchingExpressionUnderTest)))
-			.willReturn(Optional.ofNullable(this.fiveCubes));
+		given(this.cubeService.findAllByName(eq(matchingExpression)))
+			.willReturn(CubeHelper.builder().withCubes(2).withImages(2).get());
 
 		// when
 		mockMvc.perform(
-			get("/search").param("exp", matchingExpressionUnderTest).accept(MediaType.ALL)
+			get("/search").param("exp", matchingExpression).accept(MediaType.ALL)
 		)
 		.andExpect(status().isOk())
 		.andExpect(handler().methodName("searchPage"))
@@ -191,23 +121,20 @@ public class PageControllerIntegrationTest {
 
 		// then
 		// verify
-		verify(this.cubeDAOTemplate, times(1))
-			.findCubesByName(eq(matchingExpressionUnderTest));
-		verify(this.cubeDAOTemplate, only())
-			.findCubesByName(eq(matchingExpressionUnderTest));
+		verify(this.cubeService, times(1)).findAllByName(eq(matchingExpression));
+		verify(this.cubeService, only()).findAllByName(eq(matchingExpression));
 	}
 
 	@Test
-	void whenGETSearchPageWithUnmatchedExpressionThenResponseNOT_FOUND() throws Exception {
+	void givenNonMatchingExpression_whenGETSearchPage_thenResponsesNOT_FOUND() throws Exception {
 		// given
-		final String unmatchedExpressionUnderTest = "z";
+		final String nonMatchingExpression = "z";
 
-		given(this.cubeDAOTemplate.findCubesByName(eq(unmatchedExpressionUnderTest)))
-			.willReturn(Optional.ofNullable(null));
+		given(this.cubeService.findAllByName(eq(nonMatchingExpression))).willReturn(Collections.emptyList());
 
 		// when
 		MvcResult result = mockMvc.perform(
-			get("/search").param("exp", unmatchedExpressionUnderTest).accept(MediaType.ALL)
+			get("/search").param("exp", nonMatchingExpression).accept(MediaType.ALL)
 		)
 	   .andExpect(status().isNotFound()).andReturn();
 
@@ -216,66 +143,69 @@ public class PageControllerIntegrationTest {
 		assertThat(result.getResolvedException()).isInstanceOf(CubeNotFoundException.class);
 
 		// verify
-		verify(this.cubeDAOTemplate, times(1))
-			.findCubesByName(eq(unmatchedExpressionUnderTest));
-		verify(this.cubeDAOTemplate, only())
-			.findCubesByName(eq(unmatchedExpressionUnderTest));
+		verify(this.cubeService, times(1)).findAllByName(eq(nonMatchingExpression));
+		verify(this.cubeService, only()).findAllByName(eq(nonMatchingExpression));
 	}
 
-	@Test
-	void whenGETSearchPageWithNotAcceptableOrderParamThenResponseBAD_REQUEST() throws Exception {
-		// given
-		final String givenExpression = "x";
-		final String notAcceptableOrderUnderTest = "theta_asc";
+//	@Test
+//	void whenGETSearchPageWithNotAcceptableOrderParamThenResponseBAD_REQUEST() throws Exception {
+//		// given
+//		final String givenExpression = "x";
+//		final String notAcceptableOrderUnderTest = "theta_asc";
+//
+//		given(this.cubeService.findAllByName(eq(givenExpression)))
+//			.willReturn(Optional.ofNullable(fiveCubes));
+//
+//		// when
+//		MvcResult result = mockMvc.perform(
+//			get("/search")
+//			.param("exp", givenExpression).accept(MediaType.ALL)
+//			.param("order", notAcceptableOrderUnderTest)
+//		)
+//		.andExpect(status().isBadRequest()).andReturn();
+//
+//		// then
+//		assertThat(result.getResolvedException()).isNotNull();
+//		assertThat(result.getResolvedException()).isInstanceOf(OrderNotAcceptableException.class);
+//
+//		// verify
+//		verify(this.cubeService
+//				, times(1))
+//			.findCubesByName(eq(givenExpression));
+//		verify(this.cubeService
+//				, only())
+//			.findCubesByName(eq(givenExpression));
+//	}
 
-		given(this.cubeDAOTemplate.findCubesByName(eq(givenExpression)))
-			.willReturn(Optional.ofNullable(fiveCubes));
-
-		// when
-		MvcResult result = mockMvc.perform(
-			get("/search")
-			.param("exp", givenExpression).accept(MediaType.ALL)
-			.param("order", notAcceptableOrderUnderTest)
-		)
-		.andExpect(status().isBadRequest()).andReturn();
-
-		// then
-		assertThat(result.getResolvedException()).isNotNull();
-		assertThat(result.getResolvedException()).isInstanceOf(OrderNotAcceptableException.class);
-
-		// verify
-		verify(this.cubeDAOTemplate, times(1))
-			.findCubesByName(eq(givenExpression));
-		verify(this.cubeDAOTemplate, only())
-			.findCubesByName(eq(givenExpression));
-	}
-
-	@Test
-	void whenGETSearchPageWithOKOrderParamThenResponseOK() throws Exception {
-		// given
-		final String givenExpression = "x";
-		final String okOrderUnderTest = "price_asc";
-
-		given(this.cubeDAOTemplate.findCubesByName(eq(givenExpression)))
-			.willReturn(Optional.ofNullable(this.fiveCubes));
-
-		// when
-		mockMvc.perform(
-			get("/search")
-			.param("exp", givenExpression).accept(MediaType.ALL)
-			.param("order", okOrderUnderTest)
-		)
-		.andExpect(status().isOk())
-		.andExpect(model().size(5))
-		.andExpect(content().contentType(MediaType.TEXT_HTML))
-		.andExpect(handler().methodName("searchPage"))
-		.andExpect(view().name("catalog"));
-
-		// then
-		// verify
-		verify(this.cubeDAOTemplate, times(1))
-			.findCubesByName(eq(givenExpression));
-		verify(this.cubeDAOTemplate, only())
-			.findCubesByName(eq(givenExpression));
-	}
+//	@Test
+//	void whenGETSearchPageWithOKOrderParamThenResponseOK() throws Exception {
+//		// given
+//		final String givenExpression = "x";
+//		final String okOrderUnderTest = "price_asc";
+//
+//		given(this.cubeService
+//					  .findCubesByName(eq(givenExpression)))
+//			.willReturn(Optional.ofNullable(this.fiveCubes));
+//
+//		// when
+//		mockMvc.perform(
+//			get("/search")
+//			.param("exp", givenExpression).accept(MediaType.ALL)
+//			.param("order", okOrderUnderTest)
+//		)
+//		.andExpect(status().isOk())
+//		.andExpect(model().size(5))
+//		.andExpect(content().contentType(MediaType.TEXT_HTML))
+//		.andExpect(handler().methodName("searchPage"))
+//		.andExpect(view().name("catalog"));
+//
+//		// then
+//		// verify
+//		verify(this.cubeService
+//				, times(1))
+//			.findCubesByName(eq(givenExpression));
+//		verify(this.cubeService
+//				, only())
+//			.findCubesByName(eq(givenExpression));
+//	}
 }
