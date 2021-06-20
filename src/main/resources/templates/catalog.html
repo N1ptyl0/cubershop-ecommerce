@@ -15,11 +15,11 @@
         <link rel="stylesheet" href="/owner/dropdown.css"/>
 	</head>
 
-	<body class="bg-transparent" th:replace="~{frag/base :: base(~{::content}, (${isSearchPage} ? 'Search' : 'Category'))}">
+	<body class="bg-transparent" th:replace="~{frag/base :: base(~{::content}, (${isSearchPage} ? 'Search' : 'Catalog'))}">
 
         <div class="container-fluid my-5" th:fragment="content">
         	<hr class="mt-0 bg-dark w-75"/>
-        	<span class="h3 text-center d-block" th:text="${category}">3x3x3</span>
+        	<span class="h3 text-center d-block" th:text="${Catalog}">3x3x3</span>
             <hr class="mb-4 mt-0 bg-dark w-75"/>
 
             <div class="row justify-content-center">
