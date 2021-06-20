@@ -323,19 +323,23 @@ public class CubeServiceIntegrationTest {
 	}
 
 	@Test
-	void givenExistingName_whenFindByName_thenReturnedWithSuccess() {
+	void givenExistingName_whenFindAllByName_thenReturnedWithSuccess() {
 		//given
 		final String existingName = cubeNameReference;
 
 		// when
-		final Cube cubeFetched = cubeService.findByName(existingName).orElse(null);
+		final List<Cube> foundCubes = cubeService.findAllByName(existingName);
 
 		// then
-		assertThat(cubeFetched).isNotNull();
-		assertThat(cubeFetched.getImages()).isNotNull();
-		assertThat(cubeFetched.getImages()).as("Count of Images").hasSize(3);
-		assertThat(cubeFetched.getType()).isNotNull();
-		assertThat(cubeFetched.getColorPattern()).isNotNull();
+		assertThat(foundCubes).isNotNull();
+		assertThat(foundCubes).hasSize(1);
+		assertThat(foundCubes).allSatisfy(cube -> {
+			assertThat(cube).isNotNull();
+			assertThat(cube.getImages()).as("Images").isNotEmpty().as("Images count").hasSize(IMAGE_COUNT);
+		});
+		assertThat(foundCubes.get(0).getImages()).as("Images count").hasSize(IMAGE_COUNT);
+		assertThat(foundCubes).extracting("type").isNotNull();
+		assertThat(foundCubes).extracting("colorPattern").isNotNull();
 	}
 
 	@Test
@@ -344,20 +348,20 @@ public class CubeServiceIntegrationTest {
 		final String nonExistingName = "abc";
 
 		// when
-		final Cube cubeFetched = cubeService.findByName(nonExistingName).orElse(null);
+		final List<Cube> foundCubes = cubeService.findAllByName(nonExistingName);
 
 		// then
-		assertThat(cubeFetched).isNull();
+		assertThat(foundCubes).isEmpty();
 	}
 
 	@Test
-	void givenNullName_whenFindByName_thenExceptionThrown() {
+	void givenNullName_whenFindAllByName_thenExceptionThrown() {
 		//given
 		final String nullName = null;
 
 		// when
 		// then
-		assertThatThrownBy(() -> cubeService.findByName(nullName));
+		assertThatThrownBy(() -> cubeService.findAllByName(nullName));
 	}
 
 	@Test
