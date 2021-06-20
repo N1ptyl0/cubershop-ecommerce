@@ -1,18 +1,10 @@
 package com.cubershop.exception;
 
-import java.util.UUID;
+import org.springframework.http.HttpStatus;
 
-public final class CubeNotFoundException extends Exception {
+public final class CubeNotFoundException extends HttpException {
 
-	public CubeNotFoundException() {
-		super("Cube can not been found");
-	}
-
-	public CubeNotFoundException(String cubeName) {
-		super(String.format("Cube with name %s can not been found", cubeName));
-	}
-
-	public CubeNotFoundException(UUID cubeID) {
-		super(String.format("Cube with id %s can not been found", cubeID));
+	public CubeNotFoundException(String message) {
+		super(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.name(), message);
 	}
 }
