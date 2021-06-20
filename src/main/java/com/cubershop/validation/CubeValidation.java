@@ -4,7 +4,7 @@ import com.cubershop.entity.Cube;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class CubeValidation implements Validator {
@@ -49,20 +49,19 @@ public final class CubeValidation implements Validator {
     }
 
     private void validatePriceField(Cube cube, Errors errors) {
-        if(cube.getPrice() == null)
+        if(Objects.isNull(cube))
             errors.rejectValue("price", "cube.price.empty", "Price can not be empty");
-        else if(cube.getPrice().getValue() == 0)
+        else if(cube.getPrice() == 0)
             errors.rejectValue("price", "cube.price.zero", "Price can not be zero");
-        else if(cube.getPrice().getValue() < 0)
+        else if(cube.getPrice() < 0)
             errors.rejectValue("price", "cube.price.negative",
                 "Price can not be a negative number");
     }
 
     private void validateTypeField(Cube cube, Errors errors) {
-        if(cube.getType() == null || cube.getType().isEmpty())
+        if(cube.getType() == null)
             errors.rejectValue("type", "cube.type.empty", "Type can not be empty");
-        else if(Stream.of("2x2x2", "3x3x3", "4x4x4", "5x5x5", "big")
-        .noneMatch(v -> v.equals(cube.getType())))
+        else if(Stream.of("_2x2x2", "_3x3x3", "_4x4x4", "_5x5x5", "big").noneMatch(v -> v.equals(cube.getType())))
             errors.rejectValue("type", "cube.type.not.exist",
                 "Type not acceptable");
     }
@@ -105,27 +104,20 @@ public final class CubeValidation implements Validator {
         if(cube.getColorPattern() == null)
             errors.rejectValue("colorPattern",
             "cube.colorPattern.empty", "Color pattern can not be empty");
-        else if(cube.getColorPattern().length() < 4)
+        else if(cube.getColorPattern().getName().length() < 4)
             errors.rejectValue("colorPattern", "cube.colorPattern.too.small", "ColorPattern can not be too small");
-        else if(cube.getColorPattern().length() > 25)
+        else if(cube.getColorPattern().getName().length() > 25)
             errors.rejectValue("colorPattern", "cube.colorPattern.too.long",
                 "ColorPattern can not be too long");
     }
 
     private void validateImageFileField(Cube cube, Errors errors) {
-        if(cube.getImageFiles().stream().anyMatch(v -> {
-            try {
-                return v.getBytes().length > 1e5;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return false;
-        })) {
+        if(cube.getImages().stream().anyMatch(i -> i.getBody().length > 1e5)) {
             errors.rejectValue("imageFiles",
                 "cube.imageFiles.size.exceeded",
                 "Some file exceeded the file size acceptable");
         }
-        else if(cube.getImageFiles().size() < 2) {
+        else if(cube.getImages().size() < 2) {
             errors.rejectValue("imageFiles",
                 "cube.imageFiles.image.min.select",
                 "Select at least two images");
