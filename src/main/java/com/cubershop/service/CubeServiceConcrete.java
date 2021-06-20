@@ -98,6 +98,7 @@ public class CubeServiceConcrete implements CubeService {
 
 	@Override
 	public List<Cube> findAllByName(String name) {
+		if (Objects.isNull(name)) throw new IllegalArgumentException("Name can not be null!");
 		return this.cubeRepository.findAllByName(name);
 	}
 
